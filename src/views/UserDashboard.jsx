@@ -8083,7 +8083,7 @@ export default function UserDashboard() {
                   setConfirmOverwrite(false);
                   triggerToast(`Activated "${targetKit.name}" workstation! Choose a preset foundation.`, 'success');
                 }}
-                className="flex-1 bg-sky-50 hover:bg-sky-650 text-white font-extrabold py-2 px-4 rounded-lg shadow-md cursor-pointer text-xs text-center justify-center border-none"
+                className="flex-1 bg-sky-500 hover:bg-sky-650 text-white font-extrabold py-2 px-4 rounded-lg shadow-md cursor-pointer text-xs text-center justify-center border-none"
               >
                 <span>Activate & Proceed</span>
               </Button>
