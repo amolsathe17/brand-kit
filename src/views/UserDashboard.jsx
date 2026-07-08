@@ -7944,48 +7944,45 @@ export default function UserDashboard() {
                   );
                 })}
               </div>
-
-              {/* Confirmation details */}
-              {selectedPresetId && (() => {
-                const selectedPreset = presetProjects.find(p => p.id === selectedPresetId);
-                return (
-                  <div className={`p-4 border rounded-xl space-y-3 transition-all animate-in fade-in duration-300 ${
-                    darkMode ? 'bg-slate-950/40 border-slate-800' : 'bg-slate-50 border-slate-200'
-                  }`}>
-                    <div className="flex items-start space-x-2">
-                      <LucideIcons.AlertTriangle className="text-amber-500 h-4.5 w-4.5 shrink-0 mt-0.5" />
-                      <div className="space-y-1">
-                        <span className="text-[11px] font-bold block">Overwriting Confirmation</span>
-                        <p className="text-[10px] text-slate-500 leading-relaxed">
-                          Applying <strong className="text-slate-850 dark:text-slate-100">"{selectedPreset?.name}"</strong> will replace the existing color palette, typography font families, typography weights, margin spacing parameters, and icons of <strong className="text-slate-850 dark:text-slate-100">"{modifyingProject.name}"</strong>.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="p-3 rounded-lg bg-sky-500/10 border border-sky-500/15 flex items-start space-x-2 text-[10px] text-slate-500 leading-relaxed">
-                      <LucideIcons.CheckCircle className="text-sky-500 h-4 w-4 shrink-0 mt-0.2" />
-                      <span>
-                        <strong>Automated Backup:</strong> A backup of this kit's current design configuration will be committed to the Changelog history as version <strong>v{(modifyingProject.changelog?.length || 0) + 1}.0</strong>. You can restore this version at any time.
-                      </span>
-                    </div>
-
-                    <div className="pt-1.5 border-t border-slate-500/5">
-                      <label className="flex items-start space-x-2.5 text-[10px] cursor-pointer select-none">
-                        <input
-                          type="checkbox"
-                          checked={confirmOverwrite}
-                          onChange={(e) => setConfirmOverwrite(e.target.checked)}
-                          className="mt-0.5 rounded text-sky-500 focus:ring-sky-500 cursor-pointer h-3.5 w-3.5"
-                        />
-                        <span className="text-slate-500 leading-normal">
-                          I explicitly choose to replace the design system parameters of <strong>"{modifyingProject.name}"</strong>.
-                        </span>
-                      </label>
-                    </div>
-                  </div>
-                );
-              })()}
             </div>
+
+            {/* Confirmation details (Always Visible!) */}
+            {selectedPresetId && (
+              <div className={`p-4 border-t dark:border-slate-800 space-y-3 shrink-0 ${
+                darkMode ? 'bg-slate-950/20' : 'bg-slate-550/5'
+              }`}>
+                <div className="flex items-start space-x-2">
+                  <LucideIcons.AlertTriangle className="text-amber-500 h-4.5 w-4.5 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <span className="text-[11px] font-bold block text-slate-800 dark:text-slate-200">Overwriting Confirmation</span>
+                    <p className="text-[10px] text-slate-500 leading-relaxed">
+                      Applying <strong className="text-slate-850 dark:text-slate-100">"{presetProjects.find(p => p.id === selectedPresetId)?.name}"</strong> will replace the existing color palette, typography font families, typography weights, margin spacing parameters, and icons of <strong className="text-slate-850 dark:text-slate-100">"{modifyingProject.name}"</strong>.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-2.5 rounded-lg bg-sky-500/10 border border-sky-500/15 flex items-start space-x-2 text-[10px] text-slate-500 leading-relaxed">
+                  <LucideIcons.CheckCircle className="text-sky-500 h-4 w-4 shrink-0 mt-0.2" />
+                  <span>
+                    <strong>Automated Backup:</strong> A backup of this kit's current design configuration will be committed to the Changelog history as version <strong>v{(modifyingProject.changelog?.length || 0) + 1}.0</strong>. You can restore this version at any time.
+                  </span>
+                </div>
+
+                <div className="pt-1.5 border-t border-slate-500/5">
+                  <label className="flex items-start space-x-2.5 text-[10px] cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={confirmOverwrite}
+                      onChange={(e) => setConfirmOverwrite(e.target.checked)}
+                      className="mt-0.5 rounded text-sky-500 focus:ring-sky-500 cursor-pointer h-3.5 w-3.5"
+                    />
+                    <span className="text-slate-500 leading-normal">
+                      I explicitly choose to replace the design system parameters of <strong>"{modifyingProject.name}"</strong>.
+                    </span>
+                  </label>
+                </div>
+              </div>
+            )}
 
             {/* Actions */}
             <div className="flex space-x-3 pt-4 border-t dark:border-slate-800 shrink-0">
