@@ -31,7 +31,10 @@ export default function AdminDashboard() {
     updateBookingStatus,
     logout,
     login,
-    updateProject
+    updateProject,
+    applyPresetToProject,
+    setAdminViewMode,
+    adminViewMode
   } = useStore();
 
   const [toastMessage, setToastMessage] = useState(null);
@@ -145,6 +148,9 @@ export default function AdminDashboard() {
   ]);
   const [refundedOrderIds, setRefundedOrderIds] = useState([]);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
+  const [modifyingProject, setModifyingProject] = useState(null);
+  const [selectedPresetId, setSelectedPresetId] = useState('');
+  const [confirmOverwrite, setConfirmOverwrite] = useState(false);
 
   // Subscription plan limits state
   const [subLimits, setSubLimits] = useState({
@@ -891,7 +897,7 @@ export default function AdminDashboard() {
             <Button
               variant="outline"
               size="sm"
-              onClick={() => login('hello@brandkit.ai', 'user1234', 'user')}
+              onClick={() => setAdminViewMode('user')}
               className={`${darkMode ? 'border-slate-800 hover:bg-slate-900' : 'border-slate-200 hover:bg-slate-100'} text-xs text-sky-600 dark:text-sky-400 flex items-center space-x-1 shrink-0`}
             >
               <ArrowLeft size={13} />
@@ -1387,6 +1393,17 @@ export default function AdminDashboard() {
                                   title="Download PDF Spec"
                                 >
                                   <FileDown size={12} />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setModifyingProject(project);
+                                    setSelectedPresetId('');
+                                    setConfirmOverwrite(false);
+                                  }}
+                                  className="px-2.5 py-1 rounded bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500 hover:text-white font-extrabold text-[10px] transition-all cursor-pointer border-none"
+                                  title="Modify design system foundation"
+                                >
+                                  Modify
                                 </button>
                                 <button
                                   onClick={() => {
@@ -2887,6 +2904,157 @@ export default function AdminDashboard() {
                 }`}
               >
                 <span>Close</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          MODIFY BRAND KIT (APPLY PRESET) MODAL OVERLAY
+          ======================================================== */}
+      {modifyingProject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-xs" onClick={() => setModifyingProject(null)} />
+          
+          <div className={`relative w-full max-w-2xl rounded-2xl border p-6 shadow-2xl z-10 animate-in zoom-in-95 duration-200 text-left flex flex-col max-h-[90vh] ${
+            darkMode ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-202 text-slate-800'
+          }`}>
+            {/* Header */}
+            <div className="flex justify-between items-start border-b pb-4 dark:border-slate-800 shrink-0">
+              <div>
+                <h3 className={`text-base font-extrabold flex items-center space-x-2 ${cardTitleClass}`}>
+                  <Sparkles className="text-sky-500 h-5 w-5" />
+                  <span>Modify Design Foundation: {modifyingProject.name}</span>
+                </h3>
+                <p className="text-[10px] text-slate-400 mt-1">
+                  Overwrite the design system tokens with a selected System Preset configuration.
+                </p>
+              </div>
+              <button 
+                onClick={() => setModifyingProject(null)}
+                className="p-1 rounded-lg hover:bg-slate-500/10 text-slate-400 hover:text-white transition-colors cursor-pointer border-none bg-transparent"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Presets Library Browser (Scrollable) */}
+            <div className="flex-1 overflow-y-auto py-4 space-y-4 pr-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Select Preset Foundation</span>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {presetProjects.map((preset) => {
+                  const isSelected = selectedPresetId === preset.id;
+                  return (
+                    <div
+                      key={preset.id}
+                      onClick={() => setSelectedPresetId(preset.id)}
+                      className={`p-4 border rounded-xl cursor-pointer transition-all flex flex-col justify-between space-y-3 ${
+                        isSelected 
+                          ? 'border-sky-500 bg-sky-500/5 ring-1 ring-sky-500/20' 
+                          : darkMode 
+                            ? 'border-slate-800 hover:border-slate-700 bg-slate-950/40 hover:bg-slate-950/60' 
+                            : 'border-slate-200 hover:border-slate-300 bg-slate-50/50 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div>
+                        <div className="flex justify-between items-start">
+                          <span className={`font-bold text-xs ${cardTitleClass}`}>{preset.name}</span>
+                          {isSelected && <span className="h-2 w-2 rounded-full bg-sky-500 block" />}
+                        </div>
+                        <span className="text-[9px] text-slate-400 font-medium block mt-0.5">{preset.industry}</span>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-1 border-t border-slate-500/5">
+                        <div className="flex space-x-1 items-center">
+                          <span className="h-3 w-3 rounded-full border block" style={{ backgroundColor: preset.colors.primary }} />
+                          <span className="h-3 w-3 rounded-full border block" style={{ backgroundColor: preset.colors.secondary }} />
+                          <span className="h-3 w-3 rounded-full border block" style={{ backgroundColor: preset.colors.accent }} />
+                        </div>
+                        <span className="text-[9px] font-mono text-slate-500">{preset.typography.headingFont}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Confirmation Dialog & Version Warning */}
+              {selectedPresetId && (() => {
+                const selectedPreset = presetProjects.find(p => p.id === selectedPresetId);
+                return (
+                  <div className={`p-4 border rounded-xl space-y-3 transition-all animate-in fade-in duration-300 ${
+                    darkMode ? 'bg-slate-950/40 border-slate-800' : 'bg-slate-50 border-slate-200'
+                  }`}>
+                    <div className="flex items-start space-x-2">
+                      <AlertTriangle className="text-amber-500 h-4.5 w-4.5 shrink-0 mt-0.5" />
+                      <div className="space-y-1">
+                        <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 block">Design System Replacement Warning</span>
+                        <p className="text-[10px] text-slate-500 leading-relaxed">
+                          Applying <strong className="text-slate-800 dark:text-slate-100">"{selectedPreset?.name}"</strong> will replace the existing color scales, font mappings, padding, margins, shadows, and default icons of <strong className="text-slate-800 dark:text-slate-100">"{modifyingProject.name}"</strong>.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-3 rounded-lg bg-sky-500/10 border border-sky-500/15 flex items-start space-x-2 text-[10px] text-slate-500 leading-relaxed">
+                      <CheckCircle className="text-sky-500 h-4 w-4 shrink-0 mt-0.2" />
+                      <span>
+                        <strong>Automated Backup:</strong> A rollback point will be automatically generated as version <strong>v{(modifyingProject.changelog?.length || 0) + 1}.0</strong> in the Change Log. You can restore your original configurations at any time.
+                      </span>
+                    </div>
+
+                    <div className="pt-1.5 border-t border-slate-500/5">
+                      <label className="flex items-start space-x-2.5 text-[10px] cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={confirmOverwrite}
+                          onChange={(e) => setConfirmOverwrite(e.target.checked)}
+                          className="mt-0.5 rounded text-sky-500 focus:ring-sky-500 cursor-pointer h-3.5 w-3.5"
+                        />
+                        <span className="text-slate-500 leading-normal">
+                          I explicitly choose to replace the design system parameters of <strong>"{modifyingProject.name}"</strong>.
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Actions */}
+            <div className="flex space-x-3 pt-4 border-t dark:border-slate-800 shrink-0">
+              <Button
+                onClick={() => setModifyingProject(null)}
+                variant="outline"
+                className={`flex-1 font-bold py-2 px-4 rounded-lg text-xs justify-center ${
+                  darkMode ? 'border-slate-800 text-slate-300 hover:bg-slate-900' : 'border-slate-202 text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <span>Cancel</span>
+              </Button>
+              <Button
+                onClick={() => {
+                  if (!selectedPresetId) {
+                    triggerToast('Please select a system preset first!', 'warning');
+                    return;
+                  }
+                  if (!confirmOverwrite) {
+                    triggerToast('Please explicitly check the overwrite confirmation box!', 'warning');
+                    return;
+                  }
+                  const preset = presetProjects.find(p => p.id === selectedPresetId);
+                  if (preset) {
+                    applyPresetToProject(modifyingProject.id, selectedPresetId);
+                    // Force state parameters to update workstation in UserDashboard
+                    setActiveProject(modifyingProject.id);
+                    setAdminViewMode('user');
+                    setModifyingProject(null);
+                    triggerToast(`Applied "${preset.name}" preset foundation. Workstation loaded!`, 'success');
+                  }
+                }}
+                className="flex-1 bg-sky-500 hover:bg-sky-650 text-white font-extrabold py-2 px-4 rounded-lg shadow-md cursor-pointer text-xs text-center justify-center border-none"
+              >
+                <span>Confirm & Load Workstation</span>
               </Button>
             </div>
           </div>

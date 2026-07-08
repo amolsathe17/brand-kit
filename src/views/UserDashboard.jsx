@@ -724,7 +724,9 @@ export default function UserDashboard() {
     addBooking,
     updateUser,
     rollbackProject,
-    logout
+    logout,
+    adminViewMode,
+    setAdminViewMode
   } = useStore();
 
   const fallbackProject = {
@@ -787,6 +789,20 @@ export default function UserDashboard() {
   const [editProfileName, setEditProfileName] = useState(user?.name || '');
   const [editProfileEmail, setEditProfileEmail] = useState(user?.email || '');
   const [editProfileMobile, setEditProfileMobile] = useState(user?.mobile || '');
+
+  // Auto-activate Brand Kit Workstation when a custom brand kit is active
+  useEffect(() => {
+    const isCustom = activeProjectId && activeProjectId.includes('_');
+    if (isCustom) {
+      setIsBrandSelectedOrCreated(true);
+      setActiveTab(prev => {
+        if (['dashboard', 'overview'].includes(prev)) {
+          return 'create-brand';
+        }
+        return prev;
+      });
+    }
+  }, [activeProjectId]);
 
   // Synchronize state with authenticated user details
   useEffect(() => {
@@ -2333,6 +2349,16 @@ export default function UserDashboard() {
             </div>
 
             <div className="flex items-center space-x-2 md:space-x-3">
+              {user?.role === 'admin' && (
+                <button
+                  onClick={() => setAdminViewMode('admin')}
+                  className="bg-sky-500 hover:bg-sky-650 text-white font-extrabold text-xs py-1.5 px-3 rounded-lg cursor-pointer transition-all shadow-md shadow-sky-500/10 flex items-center space-x-1 border-none mr-1"
+                  title="Return to Admin Panel Control"
+                >
+                  <Shield size={13} />
+                  <span className="hidden sm:inline">Admin Panel</span>
+                </button>
+              )}
               {/* Theme Toggle Button */}
               <button
                 onClick={toggleTheme}

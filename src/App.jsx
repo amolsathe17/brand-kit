@@ -5,7 +5,7 @@ import UserDashboard from './views/UserDashboard';
 import AdminDashboard from './views/AdminDashboard';
 
 function App() {
-  const { user } = useStore();
+  const { user, adminViewMode } = useStore();
 
   // If no user is logged in, show the Auth / Login screen
   if (!user) {
@@ -13,7 +13,7 @@ function App() {
   }
 
   // Routing based on user roles
-  if (user.role === 'admin') {
+  if (user.role === 'admin' && adminViewMode !== 'user') {
     return <AdminDashboard />;
   }
 

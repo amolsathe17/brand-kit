@@ -675,6 +675,7 @@ export const useStore = create(
   
   // Theme State
   darkMode: false,
+  adminViewMode: 'admin',
   
   // Auth Actions
   login: (email, password, role = 'user') => {
@@ -1031,6 +1032,40 @@ export const useStore = create(
         b.id === bookingId ? { ...b, status } : b
       )
     }));
+  },
+
+  setAdminViewMode: (mode) => set({ adminViewMode: mode }),
+
+  applyPresetToProject: (projectId, presetId) => {
+    const state = get();
+    const project = state.projects.find(p => p.id === projectId);
+    const preset = state.projects.find(p => p.id === presetId);
+    if (project && preset) {
+      // Automatically generate a history backup & increment the version code
+      const meta = createHistoryAndChangelog(
+        project,
+        `Replaced design foundation with Preset: ${preset.name}`,
+        state.user?.email
+      );
+
+      set((state) => ({
+        projects: state.projects.map((p) => {
+          if (p.id !== projectId) return p;
+          return {
+            ...p,
+            colors: { ...preset.colors },
+            typography: { ...preset.typography },
+            spacing: { ...preset.spacing },
+            icons: [...(preset.icons || [])],
+            logoVariants: [...(preset.logoVariants || [])],
+            ...meta,
+            dateModified: new Date().toISOString().split('T')[0]
+          };
+        })
+      }));
+      return true;
+    }
+    return false;
   },
   
   // Helper to get active project
