@@ -1216,128 +1216,158 @@ export default function AdminDashboard() {
                   </Button>
                 </div>
               </Card>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Main Dispatcher table */}
-                <Card className={`${cardClass} p-6 lg:col-span-2 space-y-6 flex flex-col justify-between`}>
-                  <div className="space-y-4">
-                    <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-                      <div>
-                        <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Service Request Dispatcher</h3>
-                        <p className={`text-xs ${cardDescClass}`}>Manage, assign, and update booking records in real-time.</p>
-                      </div>
-
-                      <div className="flex flex-wrap items-center gap-3">
-                        <div className="relative shrink-0">
-                          <input
-                            type="text"
-                            placeholder="Search dispatcher..."
-                            value={searchQueries.bookings}
-                            onChange={(e) => handleQueryChange('bookings', e.target.value)}
-                            className={`text-xs rounded-lg pl-8 pr-3.5 py-1.5 border focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all font-bold w-52 ${
-                              darkMode ? 'bg-slate-950/60 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-850 shadow-sm'
-                            }`}
-                          />
-                          <Search size={12} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
-                        </div>
-
-                        <div className={`flex border p-0.5 rounded-lg shrink-0 ${darkMode ? 'bg-slate-950 border-slate-800' : 'bg-slate-100 border-slate-200'}`}>
-                          {['all', 'Pending', 'In Progress', 'Completed'].map((filter) => (
-                            <button
-                              key={filter}
-                              onClick={() => setStatusFilter(filter)}
-                              className={`text-[9px] px-2 py-1 rounded font-bold transition-all cursor-pointer border border-transparent ${
-                                statusFilter === filter ? 'bg-sky-500 text-white shadow-sm' : 'text-slate-500 dark:text-slate-455'
-                              }`}
-                            >
-                              {filter === 'all' ? 'All' : filter}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                {/* Revenue Overview Chart */}
+                <Card className={`${cardClass} p-6 space-y-4`}>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className={`text-sm font-extrabold uppercase tracking-wider ${cardTitleClass}`}>Revenue Overview & Growth</h3>
+                      <p className="text-xs text-slate-500 mt-1">Gross sales subscription logs and monthly trends.</p>
                     </div>
-
-                    <div className="overflow-x-auto border rounded-xl dark:border-slate-800/60 bg-slate-500/[0.01]">
-                      <table className="w-full text-left text-xs min-w-[550px]">
-                        <thead className={`text-xs uppercase font-semibold border-b ${tableHeaderClass}`}>
-                          <tr>
-                            <th className="p-3">Client & Brand</th>
-                            <th className="p-3">Service Details</th>
-                            <th className="p-3">Assign Specialist</th>
-                            <th className="p-3">Set Status</th>
-                          </tr>
-                        </thead>
-                        <tbody className={`divide-y ${darkMode ? 'divide-slate-800/40' : 'divide-slate-200/40'}`}>
-                          {filteredBookings.map((b) => (
-                            <tr key={b.id} className={`transition-colors ${tableRowClass}`}>
-                              <td className="p-3">
-                                <span className={`block font-semibold ${cardTitleClass}`}>{b.brandName}</span>
-                                <span className="block text-[10px] text-slate-400 dark:text-slate-500 truncate max-w-[150px]">{b.userId}</span>
-                              </td>
-                              <td className="p-3">
-                                <span className={`block font-bold ${cardTitleClass}`}>{b.serviceType}</span>
-                                <p className="text-[10px] text-slate-400 dark:text-slate-500 line-clamp-1 max-w-[200px] mt-0.5">{b.description}</p>
-                              </td>
-                              <td className="p-3">
-                                <select
-                                  value={b.assignedTechnicianId || ''}
-                                  onChange={(e) => handleAssignTech(b.id, e.target.value || null)}
-                                  className={`text-[11px] rounded-lg py-1 px-2 border w-full ${selectClass}`}
-                                >
-                                  <option value="">-- Assign Tech --</option>
-                                  {technicians.map((t) => (
-                                    <option key={t.id} value={t.id}>{t.name}</option>
-                                  ))}
-                                </select>
-                              </td>
-                              <td className="p-3">
-                                <select
-                                  value={b.status}
-                                  onChange={(e) => handleStatusChange(b.id, e.target.value)}
-                                  className={`text-[11px] rounded-lg py-1 px-2 border font-bold ${selectClass} ${
-                                    b.status === 'Completed' ? 'text-emerald-500' :
-                                    b.status === 'In Progress' ? 'text-sky-500' : 'text-slate-400'
-                                  }`}
-                                >
-                                  <option value="Pending">Pending</option>
-                                  <option value="Assigned">Assigned</option>
-                                  <option value="In Progress">In Progress</option>
-                                  <option value="Completed">Completed</option>
-                                </select>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                    <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 border border-emerald-500/20 py-0.5 px-2.5 rounded-full">+12.4% MoM</span>
+                  </div>
+                  <div className="h-56 w-full">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={[
+                        { name: 'Jan', Revenue: 18000, Users: 400 },
+                        { name: 'Feb', Revenue: 22000, Users: 520 },
+                        { name: 'Mar', Revenue: 29000, Users: 680 },
+                        { name: 'Apr', Revenue: 34000, Users: 810 },
+                        { name: 'May', Revenue: 41000, Users: 950 },
+                        { name: 'Jun', Revenue: 54000, Users: 1204 }
+                      ]} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                        <defs>
+                          <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.2}/>
+                            <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <XAxis dataKey="name" stroke={darkMode ? '#6b7280' : '#475569'} fontSize={9} />
+                        <YAxis stroke={darkMode ? '#6b7280' : '#475569'} fontSize={9} />
+                        <Tooltip />
+                        <Area type="monotone" dataKey="Revenue" stroke="#0ea5e9" fillOpacity={1} fill="url(#colorRev)" />
+                      </AreaChart>
+                    </ResponsiveContainer>
                   </div>
                 </Card>
 
-                {/* Specialists Workload list */}
-                <Card className={`${cardClass} p-6 flex flex-col justify-between`}>
-                  <div>
-                    <div className="flex items-center space-x-2.5 mb-2">
-                      <UserCheck className="text-sky-500 h-5 w-5 shrink-0" />
-                      <h3 className="text-sm font-bold uppercase tracking-wider text-slate-400 dark:text-slate-300">Specialist Workload</h3>
+                {/* Recent Activity Timeline */}
+                <Card className={`${cardClass} p-6 space-y-4`}>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <h3 className={`text-sm font-extrabold uppercase tracking-wider ${cardTitleClass}`}>Recent Activity Feed</h3>
+                      <p className="text-xs text-slate-500 mt-1">Live customer and administrator audit trail.</p>
                     </div>
-                    <p className="text-xs text-slate-500">Live active bookings assigned to design specialists.</p>
+                    <button 
+                      onClick={() => {
+                        setActiveSidebarSection('logs');
+                        triggerToast('Activity logs console opened.', 'info');
+                      }}
+                      className="text-xs text-sky-500 font-bold hover:underline cursor-pointer bg-transparent border-none"
+                    >
+                      View All
+                    </button>
                   </div>
-                  <div className={`border-t pt-4 mt-6 space-y-2.5 ${darkMode ? 'border-slate-800/60' : 'border-slate-200'}`}>
-                    {technicians.map((t) => {
-                      const assigned = bookings.filter(b => b.assignedTechnicianId === t.id && b.status !== 'Completed').length;
-                      return (
-                        <div key={t.id} className="flex justify-between items-center text-xs p-2 rounded-xl bg-slate-500/5 border border-slate-800/5">
-                          <div>
-                            <span className="text-slate-850 dark:text-slate-200 font-bold block">{t.name}</span>
-                            <span className="text-[9px] opacity-50 block">{t.role}</span>
-                          </div>
-                          <span className={`font-bold px-2 py-0.5 rounded text-[9px] ${
-                            assigned >= 2 ? 'bg-amber-500/10 text-amber-500' : 'bg-sky-500/10 text-sky-500'
-                          }`}>
-                            {assigned} Active
+                  <div className="space-y-3.5 max-h-56 overflow-y-auto pr-1">
+                    {[
+                      { action: 'User registered', desc: 'Alex Miller (usr_1) joined on Pro Tier', time: '10 mins ago', ip: '192.168.1.45' },
+                      { action: 'Brand Kit Created', desc: 'Samantha G. created "Aethera Space"', time: '1 hour ago', ip: '172.56.88.12' },
+                      { action: 'Subscription Renewal', desc: 'Mr. Corporate upgraded to Enterprise Plan', time: '3 hours ago', ip: '10.0.4.99' },
+                      { action: 'Invoice Downloaded', desc: 'Downloaded PDF Invoice for order #ORD-1002', time: '5 hours ago', ip: '192.168.1.1' },
+                      { action: 'Failed Login attempt', desc: 'Blocked brute force attempts from unknown range', time: '8 hours ago', ip: '84.55.102.1' }
+                    ].map((act, idx) => (
+                      <div key={idx} className="flex justify-between items-start text-xs border-b dark:border-slate-800/40 pb-2.5 last:border-0 last:pb-0">
+                        <div>
+                          <span className={`font-bold block ${cardTitleClass}`}>{act.action}</span>
+                          <span className="text-[10px] text-slate-500 mt-0.5 block">{act.desc}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-[10px] text-slate-400 block">{act.time}</span>
+                          <span className="text-[9px] text-sky-500 font-mono block mt-0.5">{act.ip}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* New Orders Card */}
+                <Card className={`${cardClass} p-6 space-y-4 lg:col-span-1`}>
+                  <div className="flex justify-between items-center">
+                    <h3 className={`text-sm font-extrabold uppercase tracking-wider ${cardTitleClass}`}>New Orders Today</h3>
+                    <span className="text-[10px] bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold px-2 py-0.5 rounded-full">34 Sales</span>
+                  </div>
+                  <div className="space-y-3">
+                    {[
+                      { id: 'ORD-1004', email: 'alex@techstartup.com', plan: 'Pro', total: '$249.00', status: 'Completed' },
+                      { id: 'ORD-1003', email: 'samantha.green@design.studio', plan: 'Starter', total: '$99.00', status: 'Completed' },
+                      { id: 'ORD-1002', email: 'director@corporate.com', plan: 'Enterprise', total: '$1,200.00', status: 'Completed' }
+                    ].map((order) => (
+                      <div key={order.id} className="flex justify-between items-center text-xs p-3 rounded-xl bg-slate-500/5 border border-slate-800/5">
+                        <div>
+                          <span className={`font-bold block ${cardTitleClass}`}>{order.id}</span>
+                          <span className="text-[10px] text-slate-500">{order.email}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className={`font-bold block ${cardTitleClass}`}>{order.total}</span>
+                          <span className="text-[9px] text-emerald-500 font-bold uppercase">{order.status}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+
+                {/* Pending Payments Card */}
+                <Card className={`${cardClass} p-6 space-y-4 lg:col-span-1`}>
+                  <div className="flex justify-between items-center">
+                    <h3 className={`text-sm font-extrabold uppercase tracking-wider ${cardTitleClass}`}>Pending Payments</h3>
+                    <span className="text-[10px] bg-amber-500/10 text-amber-600 dark:text-amber-400 font-bold px-2 py-0.5 rounded-full">5 Pending</span>
+                  </div>
+                  <div className="space-y-3">
+                    {[
+                      { id: 'PAY-9011', email: 'client@startup.co', amount: '$249.00', status: 'Pending Auth' },
+                      { id: 'PAY-8022', email: 'user@amber.io', amount: '$99.00', status: 'Failed Attempt' },
+                      { id: 'PAY-7711', email: 'mark@designagency.com', amount: '$1,200.00', status: 'Pending Auth' }
+                    ].map((pay) => (
+                      <div key={pay.id} className="flex justify-between items-center text-xs p-3 rounded-xl bg-slate-500/5 border border-slate-800/5">
+                        <div>
+                          <span className={`font-bold block ${cardTitleClass}`}>{pay.id}</span>
+                          <span className="text-[10px] text-slate-500">{pay.email}</span>
+                        </div>
+                        <div className="text-right">
+                          <span className={`font-bold block ${cardTitleClass}`}>{pay.amount}</span>
+                          <span className={`text-[9px] font-bold uppercase ${pay.status.includes('Failed') ? 'text-red-500' : 'text-amber-500'}`}>
+                            {pay.status}
                           </span>
                         </div>
-                      );
-                    })}
+                      </div>
+                    ))}
+                  </div>
+                </Card>
+
+                {/* Active Users Card */}
+                <Card className={`${cardClass} p-6 space-y-4 lg:col-span-1`}>
+                  <div className="flex justify-between items-center">
+                    <h3 className={`text-sm font-extrabold uppercase tracking-wider ${cardTitleClass}`}>Active Users</h3>
+                    <span className="text-[10px] bg-sky-500/10 text-sky-600 dark:text-sky-400 font-bold px-2 py-0.5 rounded-full">1,204 Active</span>
+                  </div>
+                  <div className="space-y-3">
+                    {[
+                      { id: 'usr_1', name: 'Alex Miller', plan: 'Pro', activity: 'Colors Gen', status: 'Active' },
+                      { id: 'usr_2', name: 'Samantha Green', plan: 'Starter', activity: 'Figma Sync', status: 'Active' },
+                      { id: 'usr_4', name: 'Mr. Corporate', plan: 'Enterprise', activity: 'PDF Export', status: 'Active' }
+                    ].map((user) => (
+                      <div key={user.id} className="flex justify-between items-center text-xs p-3 rounded-xl bg-slate-500/5 border border-slate-800/5">
+                        <div>
+                          <span className={`font-bold block ${cardTitleClass}`}>{user.name}</span>
+                          <span className="text-[10px] text-slate-500">{user.plan} Plan • {user.activity}</span>
+                        </div>
+                        <span className="text-[9px] text-emerald-500 font-bold uppercase bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                          {user.status}
+                        </span>
+                      </div>
+                    ))}
                   </div>
                 </Card>
               </div>
