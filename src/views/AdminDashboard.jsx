@@ -43,7 +43,13 @@ export default function AdminDashboard() {
 
   // Sidebar navigation and sub-modules routing state
   const [activeSidebarSection, setActiveSidebarSection] = useState('dashboard');
-  const [activeSubModule, setActiveSubModule] = useState('dashboard-overview');
+  const [activeSubModule, setActiveSubModule] = useState('dashboard');
+  const [billingTab, setBillingTab] = useState('orders');
+  const [brandkitTab, setBrandkitTab] = useState('list');
+  const [marketingTab, setMarketingTab] = useState('offers');
+  const [supportTab, setSupportTab] = useState('tickets');
+  const [settingsTab, setSettingsTab] = useState('general');
+  const [usersTab, setUsersTab] = useState('users');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [globalAdminSearch, setGlobalAdminSearch] = useState('');
@@ -462,183 +468,54 @@ export default function AdminDashboard() {
 
   // Left Sidebar Tree Data structure
   const navigationItems = [
-    {
-      id: 'dashboard',
-      label: 'Dashboard',
-      icon: BarChart2
-    },
-    {
-      id: 'users',
-      label: 'Users',
-      icon: Users,
-      subItems: [
-        { id: 'users-all', label: 'All Users' },
-        { id: 'users-roles', label: 'User Roles' },
-        { id: 'users-companies', label: 'Companies' }
-      ]
-    },
-    {
-      id: 'brandkits',
-      label: 'Brand Kits',
-      icon: FolderOpen
-    },
-    {
-      id: 'designsystems',
-      label: 'Design Systems',
-      icon: Layers
-    },
-    {
-      id: 'marketplace',
-      label: 'Marketplace',
-      icon: TrendingUp
-    },
-    {
-      id: 'orders',
-      label: 'Orders',
-      icon: Calendar
-    },
-    {
-      id: 'payments',
-      label: 'Payments',
-      icon: Percent
-    },
-    {
-      id: 'subscriptions',
-      label: 'Subscriptions',
-      icon: Clock
-    },
-    {
-      id: 'invoices',
-      label: 'Invoices',
-      icon: FileText
-    },
-    {
-      id: 'coupons',
-      label: 'Coupons',
-      icon: Percent
-    },
-    {
-      id: 'templates',
-      label: 'Templates',
-      icon: Briefcase
-    },
-    {
-      id: 'assets',
-      label: 'Assets',
-      icon: Upload
-    },
-    {
-      id: 'tokens',
-      label: 'Design Tokens',
-      icon: Layers
-    },
-    {
-      id: 'presets',
-      label: 'System Presets',
-      icon: Sliders
-    },
-    {
-      id: 'support',
-      label: 'Support',
-      icon: MessageSquare
-    },
-    {
-      id: 'reviews',
-      label: 'Reviews',
-      icon: Star
-    },
-    {
-      id: 'notifications',
-      label: 'Notifications',
-      icon: Bell
-    },
-    {
-      id: 'analytics',
-      label: 'Analytics',
-      icon: Activity
-    },
-    {
-      id: 'reports',
-      label: 'Reports',
-      icon: FileDown
-    },
-    {
-      id: 'marketing',
-      label: 'Marketing',
-      icon: Share2
-    },
-    {
-      id: 'blogs',
-      label: 'Blogs',
-      icon: BookOpen
-    },
-    {
-      id: 'documentation',
-      label: 'Documentation',
-      icon: BookOpen
-    },
-    {
-      id: 'helpcenter',
-      label: 'Help Center',
-      icon: HelpCircle
-    },
-    {
-      id: 'aimonitoring',
-      label: 'AI Monitoring',
-      icon: Activity
-    },
-    {
-      id: 'developer',
-      label: 'Developer Console',
-      icon: Terminal
-    },
-    {
-      id: 'auditlogs',
-      label: 'Audit Logs',
-      icon: Clipboard
-    },
-    {
-      id: 'security',
-      label: 'Security',
-      icon: Shield
-    },
-    {
-      id: 'backups',
-      label: 'Backups',
-      icon: RefreshCw
-    },
-    {
-      id: 'integrations',
-      label: 'Integrations',
-      icon: Globe
-    },
-    {
-      id: 'settings',
-      label: 'Settings',
-      icon: Settings
-    }
+    { id: 'dashboard', label: 'Dashboard', icon: BarChart2 },
+    { id: 'users', label: 'Users', icon: Users },
+    { id: 'brandkits', label: 'Brand Kits', icon: FolderOpen },
+    { id: 'orders', label: 'Orders & Billing', icon: Calendar },
+    { id: 'marketing', label: 'Marketing', icon: Share2 },
+    { id: 'logs', label: 'Activity Logs', icon: Clipboard },
+    { id: 'analytics', label: 'Analytics', icon: Activity },
+    { id: 'support', label: 'Support', icon: MessageSquare },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
+    { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
   // Helper for Breadcrumb path resolving
   const breadcrumbPath = useMemo(() => {
-    for (const item of navigationItems) {
-      if (item.subItems) {
-        const match = item.subItems.find(sub => sub.id === activeSubModule);
-        if (match) {
-          return [item.label, match.label];
-        }
-      }
-      if (item.id === activeSubModule || (item.id === 'dashboard' && activeSubModule.startsWith('dashboard-'))) {
-        const subLabels = {
-          'dashboard-overview': 'Overview',
-          'dashboard-analytics': 'Analytics',
-          'dashboard-activity': 'Recent Activity'
+    const item = navigationItems.find(nav => nav.id === activeSidebarSection);
+    if (item) {
+      let subName = '';
+      if (activeSidebarSection === 'orders') {
+        const tabLabels = {
+          orders: 'Orders',
+          payments: 'Payments Received',
+          pending: 'Pending Payments',
+          failed: 'Failed Payments',
+          refunds: 'Refunds',
+          invoices: 'Invoices',
+          taxes: 'GST & Taxes',
+          coupons: 'Coupons',
+          renewals: 'Subscription Renewals',
+          history: 'Transaction History'
         };
-        return [item.label, subLabels[activeSubModule] || item.label];
+        subName = tabLabels[billingTab] || '';
+      } else if (activeSidebarSection === 'brandkits') {
+        const tabLabels = { list: 'All Brand Kits', presets: 'System Presets', 'design-systems': 'Design Systems' };
+        subName = tabLabels[brandkitTab] || '';
+      } else if (activeSidebarSection === 'marketing') {
+        const tabLabels = { offers: 'Offers', coupons: 'Coupon Management', 'email-push': 'Email Campaigns', banners: 'Announcement Banners' };
+        subName = tabLabels[marketingTab] || '';
+      } else if (activeSidebarSection === 'support') {
+        const tabLabels = { tickets: 'Support Tickets', contact: 'Contact Messages', 'bugs-features': 'Bugs & Features' };
+        subName = tabLabels[supportTab] || '';
+      } else if (activeSidebarSection === 'settings') {
+        const tabLabels = { general: 'General', gateways: 'Payment Gateways', integrations: 'Integrations', roles: 'Roles & Permissions', security: 'Security & 2FA' };
+        subName = tabLabels[settingsTab] || '';
       }
+      return subName ? [item.label, subName] : [item.label];
     }
     return ['Admin', 'Control Panel'];
-  }, [activeSubModule]);
+  }, [activeSidebarSection, billingTab, brandkitTab, marketingTab, supportTab, settingsTab]);
 
 
   const SidebarContent = ({ isMobile = false }) => (
@@ -692,39 +569,7 @@ export default function AdminDashboard() {
                       }
                     } else {
                       setActiveSidebarSection(group.id);
-                      const defaults = {
-                        'dashboard': 'dashboard-overview',
-                        'users': 'users-all',
-                        'brandkits': 'brandkits-all',
-                        'designsystems': 'brandkits-components',
-                        'marketplace': 'marketplace-published',
-                        'orders': 'orders-purchases',
-                        'payments': 'payments-gateways',
-                        'subscriptions': 'subscriptions-limits',
-                        'invoices': 'orders-invoices',
-                        'coupons': 'orders-coupons',
-                        'templates': 'marketplace-published',
-                        'assets': 'media-images',
-                        'tokens': 'brandkits-categories',
-                        'presets': 'marketplace-published',
-                        'support': 'support-tickets',
-                        'reviews': 'reviews',
-                        'notifications': 'notifications',
-                        'analytics': 'dashboard-analytics',
-                        'reports': 'reports',
-                        'marketing': 'marketing',
-                        'blogs': 'content-docs',
-                        'documentation': 'content-docs',
-                        'helpcenter': 'support-contact',
-                        'aimonitoring': 'aimonitoring',
-                        'developer': 'developer-api',
-                        'auditlogs': 'system-audit',
-                        'security': 'system-roles',
-                        'backups': 'backups',
-                        'integrations': 'integrations',
-                        'settings': 'system-settings'
-                      };
-                      setActiveSubModule(defaults[group.id] || group.id);
+                      setActiveSubModule(group.id);
                       if (isMobile) setMobileMenuOpen(false);
                     }
                   }}
@@ -1006,12 +851,13 @@ export default function AdminDashboard() {
 
         {/* Scrollable View Area */}
         <div className="p-4 sm:p-6 md:p-8 w-full space-y-8 flex-1 overflow-x-hidden">
+          {/* Dashboard Tab Bar */}
           {activeSidebarSection === 'dashboard' && (
             <div className="flex border-b dark:border-slate-800 space-x-6 text-xs font-bold pb-2">
               <button
                 onClick={() => setActiveSubModule('dashboard-overview')}
                 className={`pb-2 border-b-2 transition-all cursor-pointer ${
-                  activeSubModule === 'dashboard-overview'
+                  activeSubModule === 'dashboard-overview' || activeSubModule === 'dashboard'
                     ? 'border-sky-500 text-sky-500 font-extrabold'
                     : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
                 }`}
@@ -1041,7 +887,258 @@ export default function AdminDashboard() {
             </div>
           )}
 
-                    {['dashboard-overview', 'dashboard'].includes(activeSubModule) && (
+          {/* Users Tab Bar */}
+          {activeSidebarSection === 'users' && (
+            <div className="flex border-b dark:border-slate-800 space-x-6 text-xs font-bold pb-2">
+              <button
+                onClick={() => setUsersTab('users')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  usersTab === 'users'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                All Users
+              </button>
+              <button
+                onClick={() => setUsersTab('roles')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  usersTab === 'roles'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                User Roles
+              </button>
+              <button
+                onClick={() => setUsersTab('companies')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  usersTab === 'companies'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                Companies & Teams
+              </button>
+            </div>
+          )}
+
+          {/* Brand Kits Tab Bar */}
+          {activeSidebarSection === 'brandkits' && (
+            <div className="flex border-b dark:border-slate-800 space-x-6 text-xs font-bold pb-2">
+              <button
+                onClick={() => setBrandkitTab('list')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  brandkitTab === 'list'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                All Brand Kits
+              </button>
+              <button
+                onClick={() => setBrandkitTab('design-systems')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  brandkitTab === 'design-systems'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                Design Systems
+              </button>
+              <button
+                onClick={() => setBrandkitTab('presets')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  brandkitTab === 'presets'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                System Presets
+              </button>
+              <button
+                onClick={() => setBrandkitTab('assets')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  brandkitTab === 'assets'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                Asset Library
+              </button>
+            </div>
+          )}
+
+          {/* Orders & Billing Tab Bar */}
+          {activeSidebarSection === 'orders' && (
+            <div className="flex border-b dark:border-slate-800 space-x-6 text-xs font-bold pb-2 overflow-x-auto scrollbar-none whitespace-nowrap">
+              {[
+                { id: 'orders', label: 'Orders' },
+                { id: 'payments', label: 'Payments Received' },
+                { id: 'pending', label: 'Pending Payments' },
+                { id: 'failed', label: 'Failed Payments' },
+                { id: 'refunds', label: 'Refunds' },
+                { id: 'invoices', label: 'Invoices' },
+                { id: 'taxes', label: 'GST & Taxes' },
+                { id: 'coupons', label: 'Coupons' },
+                { id: 'renewals', label: 'Subscription Renewals' },
+                { id: 'history', label: 'Transaction History' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setBillingTab(tab.id)}
+                  className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                    billingTab === tab.id
+                      ? 'border-sky-500 text-sky-500 font-extrabold'
+                      : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Marketing Tab Bar */}
+          {activeSidebarSection === 'marketing' && (
+            <div className="flex border-b dark:border-slate-800 space-x-6 text-xs font-bold pb-2">
+              <button
+                onClick={() => setMarketingTab('offers')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  marketingTab === 'offers'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                Offers & Campaigns
+              </button>
+              <button
+                onClick={() => setMarketingTab('coupons')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  marketingTab === 'coupons'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                Coupon Management
+              </button>
+              <button
+                onClick={() => setMarketingTab('email-push')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  marketingTab === 'email-push'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                Email & Push Campaigns
+              </button>
+              <button
+                onClick={() => setMarketingTab('banners')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  marketingTab === 'banners'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                Announcement Banners
+              </button>
+            </div>
+          )}
+
+          {/* Support Tab Bar */}
+          {activeSidebarSection === 'support' && (
+            <div className="flex border-b dark:border-slate-800 space-x-6 text-xs font-bold pb-2">
+              <button
+                onClick={() => setSupportTab('tickets')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  supportTab === 'tickets'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                Support Tickets
+              </button>
+              <button
+                onClick={() => setSupportTab('contact')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  supportTab === 'contact'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                Contact Messages
+              </button>
+              <button
+                onClick={() => setSupportTab('bugs-features')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  supportTab === 'bugs-features'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                Bugs & Features
+              </button>
+            </div>
+          )}
+
+          {/* Settings Tab Bar */}
+          {activeSidebarSection === 'settings' && (
+            <div className="flex border-b dark:border-slate-800 space-x-6 text-xs font-bold pb-2">
+              <button
+                onClick={() => setSettingsTab('general')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  settingsTab === 'general'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                General Settings
+              </button>
+              <button
+                onClick={() => setSettingsTab('gateways')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  settingsTab === 'gateways'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                Payment Gateways
+              </button>
+              <button
+                onClick={() => setSettingsTab('integrations')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  settingsTab === 'integrations'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                Integrations
+              </button>
+              <button
+                onClick={() => setSettingsTab('roles')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  settingsTab === 'roles'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                Roles & Permissions
+              </button>
+              <button
+                onClick={() => setSettingsTab('security')}
+                className={`pb-2 border-b-2 transition-all cursor-pointer ${
+                  settingsTab === 'security'
+                    ? 'border-sky-500 text-sky-500 font-extrabold'
+                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                Security & 2FA
+              </button>
+            </div>
+          )}
+
+
+                    {['dashboard-overview', 'dashboard'].includes(activeSubModule) && activeSidebarSection === 'dashboard' && (
             <div className="space-y-8 animate-in fade-in duration-200">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Main Dispatcher table */}
@@ -1217,7 +1314,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: DASHBOARD ANALYTICS */}
-          {['dashboard-analytics', 'analytics'].includes(activeSubModule) && (
+          {activeSidebarSection === 'analytics' && (
             <div className="space-y-8 animate-in fade-in duration-200">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <Card className={`${cardClass} p-6 space-y-4`}>
@@ -1266,7 +1363,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: DASHBOARD RECENT ACTIVITY */}
-          {activeSubModule === 'dashboard-activity' && (
+          {activeSidebarSection === 'dashboard' && activeSubModule === 'dashboard-activity' && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <h3 className={`text-sm font-extrabold uppercase tracking-wider ${cardTitleClass}`}>Recent Platform Activity Feed</h3>
               <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 scrollbar-thin">
@@ -1293,7 +1390,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: CUSTOMERS USERS */}
-          {['customers-users', 'users-all'].includes(activeSubModule) && (
+          {activeSidebarSection === 'users' && usersTab === 'users' && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -1369,7 +1466,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: CUSTOMERS ORGS / TEAMS / ACTIVITY */}
-          {['customers-orgs', 'customers-teams', 'customers-activity', 'users-companies'].includes(activeSubModule) && (
+          {activeSidebarSection === 'users' && usersTab === 'companies' && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Organizations & Teams Control</h3>
               <p className="text-xs text-slate-500">Overview of client structure, active teams, and API usage stats.</p>
@@ -1403,7 +1500,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: ALL BRAND KITS */}
-          {['brandkits-all', 'brandkits'].includes(activeSubModule) && (
+          {activeSidebarSection === 'brandkits' && brandkitTab === 'list' && (
             <div className="space-y-6 animate-in fade-in duration-200">
               <div className="flex justify-end">
                 <div className="relative shrink-0">
@@ -1570,7 +1667,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: DESIGN TOKENS EDITOR */}
-          {['brandkits-categories', 'tokens'].includes(activeSubModule) && (
+          {activeSidebarSection === 'brandkits' && brandkitTab === 'tokens' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-200">
               <Card className={`${cardClass} p-6 lg:col-span-2 space-y-6`}>
                 <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Global Design Tokens Registry</h3>
@@ -1662,7 +1759,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: COMPONENT LIBRARY */}
-          {['brandkits-components', 'designsystems'].includes(activeSubModule) && (
+          {activeSidebarSection === 'brandkits' && brandkitTab === 'design-systems' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-200">
               <Card className={`${cardClass} p-6 lg:col-span-2 space-y-6`}>
                 <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Reusable UI Component Spec Library</h3>
@@ -1742,7 +1839,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: MARKETPLACE MODERATION */}
-          {['marketplace-published', 'marketplace', 'templates', 'presets'].includes(activeSubModule) && (
+          {activeSidebarSection === 'brandkits' && brandkitTab === 'presets' && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Marketplace Published Kits</h3>
               <div className="overflow-x-auto border rounded-xl dark:border-slate-800/60 bg-slate-500/[0.01]">
@@ -1808,7 +1905,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: ORDERS & REFUND MANAGER */}
-          {['orders-purchases', 'orders'].includes(activeSubModule) && (
+          {activeSidebarSection === 'orders' && billingTab === 'orders' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-200">
               <Card className={`${cardClass} p-6 lg:col-span-2 space-y-6`}>
                 <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Orders Ledger</h3>
@@ -1915,7 +2012,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: INVOICES MANAGER */}
-          {['orders-invoices', 'invoices'].includes(activeSubModule) && (
+          {activeSidebarSection === 'orders' && billingTab === 'invoices' && (
             <div className="space-y-6 animate-in fade-in duration-200">
               <Card className={`${cardClass} p-6 space-y-6`}>
                 <div className="flex justify-between items-center">
@@ -1972,7 +2069,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: REFUNDS MANAGER */}
-          {activeSubModule === 'orders-refunds' && (() => {
+          {activeSidebarSection === 'orders' && billingTab === 'refunds' && (() => {
             const refundedList = combinedOrders.filter(o => o.status === 'Refunded');
             const completedList = combinedOrders.filter(o => o.status === 'Completed');
             return (
@@ -2079,7 +2176,7 @@ export default function AdminDashboard() {
           })()}
 
           {/* VIEW: COUPONS MANAGER */}
-          {['orders-coupons', 'coupons'].includes(activeSubModule) && (
+          {((activeSidebarSection === 'orders' && billingTab === 'coupons') || (activeSidebarSection === 'marketing' && marketingTab === 'coupons')) && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-200">
               <Card className={`${cardClass} p-6 lg:col-span-2 space-y-6`}>
                 <div className="flex justify-between items-center">
@@ -2184,7 +2281,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: SUBSCRIPTIONS & LIMITS EDITORS */}
-          {['subscriptions-limits', 'subscriptions'].includes(activeSubModule) && (
+          {activeSidebarSection === 'orders' && billingTab === 'renewals' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-200">
               <Card className={`${cardClass} p-6 lg:col-span-2 space-y-6`}>
                 <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Active Plan Usage Limits</h3>
@@ -2274,7 +2371,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: PAYMENT GATEWAYS CONFIGURATION */}
-          {['payments-gateways', 'payments'].includes(activeSubModule) && (
+          {activeSidebarSection === 'settings' && settingsTab === 'gateways' && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Active Payment Gateway Integrations</h3>
               
@@ -2314,7 +2411,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: MEDIA ASSET VAULT */}
-          {['media-images', 'assets'].includes(activeSubModule) && (
+          {activeSidebarSection === 'brandkits' && brandkitTab === 'assets' && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -2361,7 +2458,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: CONTENT DOCUMENTATION */}
-          {['content-docs', 'blogs', 'documentation'].includes(activeSubModule) && (
+          {activeSidebarSection === 'marketing' && marketingTab === 'banners' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-200">
               <Card className={`${cardClass} p-6 lg:col-span-2 space-y-6`}>
                 <h3 className={`text-base font-extrabold ${cardTitleClass}`}>System Knowledge Base Articles</h3>
@@ -2434,7 +2531,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: SUPPORT TICKETS */}
-          {['support-tickets', 'support'].includes(activeSubModule) && (
+          {activeSidebarSection === 'support' && supportTab === 'tickets' && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-200">
               <Card className={`${cardClass} p-6 lg:col-span-2 space-y-6`}>
                 <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Active Customer Tickets</h3>
@@ -2541,7 +2638,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: SYSTEM SETTINGS */}
-          {['system-settings', 'settings'].includes(activeSubModule) && (
+          {activeSidebarSection === 'settings' && settingsTab === 'general' && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <h3 className={`text-base font-extrabold ${cardTitleClass}`}>General Brand System Parameters</h3>
               
@@ -2617,7 +2714,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: SYSTEM ROLES ACCESS MATRIX */}
-          {['system-roles', 'users-roles', 'security'].includes(activeSubModule) && (
+          {((activeSidebarSection === 'users' && usersTab === 'roles') || (activeSidebarSection === 'settings' && settingsTab === 'roles')) && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Granular Access Control Matrix</h3>
               <div className="overflow-x-auto border rounded-xl dark:border-slate-800/60 bg-slate-500/[0.01]">
@@ -2676,7 +2773,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: SYSTEM AUDIT LOGS */}
-          {['system-audit', 'auditlogs'].includes(activeSubModule) && (
+          {activeSidebarSection === 'logs' && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <h3 className={`text-base font-extrabold ${cardTitleClass}`}>System Audit logs</h3>
               <div className="overflow-x-auto border rounded-xl dark:border-slate-800/60 bg-slate-500/[0.01]">
@@ -2705,7 +2802,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: DEVELOPER API & WEBHOOK EVENTS */}
-          {['developer-api', 'developer'].includes(activeSubModule) && (
+          {activeSidebarSection === 'settings' && settingsTab === 'integrations' && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <div className="flex justify-between items-center">
                 <div>
@@ -2751,7 +2848,7 @@ export default function AdminDashboard() {
           )}
 
           {/* FALLBACK VIEW FOR OTHER MODULES */}
-          {!['dashboard', 'dashboard-overview', 'dashboard-analytics', 'dashboard-activity', 'users-all', 'customers-users', 'users-roles', 'system-roles', 'users-companies', 'customers-orgs', 'brandkits-all', 'brandkits', 'designsystems', 'brandkits-components', 'marketplace-published', 'marketplace', 'templates', 'presets', 'orders-purchases', 'orders', 'payments-gateways', 'payments', 'subscriptions-limits', 'subscriptions', 'orders-invoices', 'invoices', 'orders-coupons', 'coupons', 'media-images', 'assets', 'tokens', 'brandkits-categories', 'support-tickets', 'support', 'content-docs', 'blogs', 'documentation', 'support-contact', 'helpcenter', 'developer-api', 'developer', 'system-audit', 'auditlogs', 'developer-integrations', 'integrations', 'system-settings', 'settings', 'security', 'aimonitoring', 'orders-refunds'].includes(activeSubModule) && (
+          {!['dashboard', 'users', 'brandkits', 'orders', 'marketing', 'logs', 'analytics', 'support', 'notifications', 'settings'].includes(activeSidebarSection) && (
             (() => {
               let activeLabel = 'Workspace Module';
               let activeDesc = 'Configure and sync enterprise assets, systems, and developer logs in real-time.';
@@ -2770,40 +2867,7 @@ export default function AdminDashboard() {
               }
 
               let mockData = null;
-              if (activeSubModule === 'backups') {
-                activeDesc = 'Automated cloud database backups, restoration checkpoints, and storage snapshots.';
-                mockData = {
-                  headers: ['Backup ID', 'Snapshot Date', 'Size', 'Location', 'Status'],
-                  rows: [
-                    ['BK-9801', '2026-07-08 04:00', '1.24 GB', 'AWS S3 (us-east-1)', 'Completed'],
-                    ['BK-9752', '2026-07-07 04:00', '1.21 GB', 'AWS S3 (us-east-1)', 'Completed'],
-                    ['BK-9710', '2026-07-06 04:00', '1.20 GB', 'AWS S3 (us-east-1)', 'Completed'],
-                    ['BK-9689', '2026-07-05 04:00', '1.18 GB', 'AWS S3 (us-east-1)', 'Completed']
-                  ]
-                };
-              } else if (activeSubModule === 'integrations') {
-                activeDesc = 'Sync tokens, designs, and files directly with Figma, GitHub, Slack, Notion, and Jira.';
-                mockData = {
-                  headers: ['Platform', 'Type', 'Sync Status', 'Last Sync', 'Connection'],
-                  rows: [
-                    ['Figma Plugin', 'Design Sync', 'Active', '10 mins ago', 'Connected'],
-                    ['GitHub App', 'Version Control', 'Active', '1 hour ago', 'Connected'],
-                    ['Slack Webhook', 'Notifications', 'Active', '2 hours ago', 'Connected'],
-                    ['Notion Integration', 'Asset Sync', 'Inactive', 'Never', 'Disconnected']
-                  ]
-                };
-              } else if (activeSubModule === 'marketing') {
-                activeDesc = 'Manage customer newsletters, email campaign builders, referral programs, and analytics.';
-                mockData = {
-                  headers: ['Campaign Name', 'Target Audience', 'Sent Count', 'Open Rate', 'Status'],
-                  rows: [
-                    ['Weekly Digest #26', 'All Registered Users', '12,450', '42.8%', 'Sent'],
-                    ['Re-engagement Offer', 'Inactive Users (30d)', '1,200', '28.1%', 'Active'],
-                    ['July Premium Release', 'Enterprise Accounts', '450', '74.2%', 'Scheduled'],
-                    ['Welcome Sequence', 'New Users (Triggered)', 'Daily Flow', '88.5%', 'Active']
-                  ]
-                };
-              } else if (activeSubModule === 'notifications') {
+              if (activeSidebarSection === 'notifications') {
                 activeDesc = 'Broadcast global push notifications, SMS alerts, and app-wide announcement banners.';
                 mockData = {
                   headers: ['Announcement ID', 'Type', 'Target Aud', 'Delivery Date', 'Status'],
@@ -2813,37 +2877,101 @@ export default function AdminDashboard() {
                     ['ANN-102', 'Email Blast', 'All Users', '2026-07-01', 'Archived']
                   ]
                 };
-              } else if (activeSubModule === 'reports') {
-                activeDesc = 'Download detailed PDF, CSV, and Excel spreadsheets for daily sales, tax collections, and storage logs.';
-                mockData = {
-                  headers: ['Report Type', 'Period', 'File Format', 'Generated By', 'Download'],
-                  rows: [
-                    ['Daily Sales Ledger', 'Today (July 8)', 'CSV', 'Admin Controller', 'Download'],
-                    ['Tax & GST Audit', 'Q2 2026', 'Excel (.xlsx)', 'Finance Manager', 'Download'],
-                    ['Storage Capacity Metrics', 'Monthly (June)', 'PDF', 'System Daemon', 'Download']
-                  ]
-                };
-              } else if (activeSubModule === 'aimonitoring') {
-                activeDesc = 'Monitor prompt consumption costs, neural network suggestion logs, and model response metrics.';
-                mockData = {
-                  headers: ['Prompt Type', 'Model Provider', 'Latency (ms)', 'Tokens Used', 'Status'],
-                  rows: [
-                    ['Colors Generation', 'Gemini 2.5 Flash', '480 ms', '1,200', 'Success'],
-                    ['Typography Pairing', 'Gemini 2.5 Flash', '610 ms', '1,450', 'Success'],
-                    ['Brand Voice Copywriting', 'Gemini 2.5 Pro', '1,120 ms', '3,400', 'Success'],
-                    ['Icon Auto Suggest', 'Gemini 2.5 Flash', '320 ms', '800', 'Success']
-                  ]
-                };
-              } else if (activeSubModule === 'reviews') {
-                activeDesc = 'Moderate user feedback, review comments, ratings, and design approvals.';
-                mockData = {
-                  headers: ['User Name', 'Target Kit', 'Rating', 'Feedback Comment', 'Status'],
-                  rows: [
-                    ['Sarah Connor', 'Aethera Space', '5 Stars', 'Absolutely beautiful spacing and typography choices!', 'Approved'],
-                    ['Bruce Wayne', 'Veloce Motors', '5 Stars', 'Matches high performance brand requirements completely.', 'Approved'],
-                    ['Clark Kent', 'Nordic Cabin', '4 Stars', 'Love the warm colors, very sustainable design aesthetic.', 'Pending']
-                  ]
-                };
+              } else if (activeSidebarSection === 'marketing') {
+                if (marketingTab === 'offers') {
+                  activeDesc = 'Design and schedule promotional campaigns, new SaaS offers, and seasonal discounts.';
+                  mockData = {
+                    headers: ['Offer Campaign', 'Validity Period', 'Discount Rate', 'Total Users targeted', 'Status'],
+                    rows: [
+                      ['Summer Kickoff Promo', 'July 1 - July 15', '25% Flat', '8,400', 'Active'],
+                      ['Enterprise Suite Trial', 'July 8 - Dec 31', 'Custom Quote', '350 Accounts', 'Active'],
+                      ['Honeymoon Plan Bonus', 'Expired', '15% Off', '1,200', 'Ended']
+                    ]
+                  };
+                } else if (marketingTab === 'email-push') {
+                  activeDesc = 'Dispatch bulk newsletter announcements, app push notifications, and drip sequences.';
+                  mockData = {
+                    headers: ['Template Name', 'Channel Type', 'Audience Segment', 'Delivery', 'Open / Click Rate'],
+                    rows: [
+                      ['Weekly Platform Digest', 'Email Campaign', 'All Customers', 'Weekly', '45.2% / 12.8%'],
+                      ['Credit Refill Reminder', 'Push Alert', 'AI Credit <= 10', 'Real-Time', '78.1% / 32.4%'],
+                      ['Design System v2.0 Release', 'Email Broadcast', 'Pro / Enterprise', 'Ad-hoc', '62.4% / 28.9%']
+                    ]
+                  };
+                }
+              } else if (activeSidebarSection === 'orders') {
+                if (['payments', 'history'].includes(billingTab)) {
+                  activeDesc = 'Reconciliation of payments received, transaction history logs, and payout structures.';
+                  mockData = {
+                    headers: ['Transaction ID', 'Gateway', 'Total Captured', 'Platform Fee', 'Net Settlement', 'Status'],
+                    rows: [
+                      ['ch_stripe_9801', 'Stripe', '$249.00', '$7.47', '$241.53', 'Settled'],
+                      ['ch_paypal_8812', 'PayPal', '$199.00', '$5.97', '$193.03', 'Settled'],
+                      ['ch_razor_7721', 'Razorpay', '$99.00', '$2.97', '$96.03', 'Settled']
+                    ]
+                  };
+                } else if (['pending', 'failed'].includes(billingTab)) {
+                  activeDesc = 'Active cart checkouts, invoice reminders, and failed payment recovery workflows.';
+                  mockData = {
+                    headers: ['Attempt ID', 'Gateway Code', 'Customer Email', 'Failure Reason', 'Retries', 'Status'],
+                    rows: [
+                      ['att_9011', 'Stripe (3D_SECURE)', 'client@startup.co', 'Customer authentication failed', '1 of 3', 'Pending Retry'],
+                      ['att_8022', 'PayPal (INSUFFICIENT)', 'user@amber.io', 'Insufficient funds in wallet', '0 of 3', 'Failed']
+                    ]
+                  };
+                } else if (billingTab === 'taxes') {
+                  activeDesc = 'GST declarations, country-wise VAT collection logs, and quarterly tax summaries.';
+                  mockData = {
+                    headers: ['Fiscal Period', 'Tax Category', 'Gross Taxable Sales', 'Total Tax Collected', 'Filing Status'],
+                    rows: [
+                      ['Q2 2026', 'VAT & GST (Global)', '$84,200.00', '$12,630.00', 'Filed & Approved'],
+                      ['Q1 2026', 'VAT & GST (Global)', '$72,100.00', '$10,815.00', 'Filed & Approved']
+                    ]
+                  };
+                }
+              } else if (activeSidebarSection === 'support') {
+                if (supportTab === 'contact') {
+                  activeDesc = 'General inquiries, support contact requests, and guest feedback forms.';
+                  mockData = {
+                    headers: ['Request ID', 'Sender', 'Subject Title', 'Received Date', 'Handling Staff'],
+                    rows: [
+                      ['REQ-802', 'mark@designagency.com', 'Enterprise branding volume pricing enquiry', '2026-07-08', 'Sales Team'],
+                      ['REQ-791', 'support@freelancer.net', 'General question regarding typography licenses', '2026-07-07', 'Support Queue']
+                    ]
+                  };
+                } else if (supportTab === 'bugs-features') {
+                  activeDesc = 'Customer feature requests voting boards, UI/UX feedback, and bug report tracking.';
+                  mockData = {
+                    headers: ['Ticket ID', 'Reporter', 'Module Area', 'Priority Level', 'Developer Status'],
+                    rows: [
+                      ['BUG-092', 'Alex Mercer', 'PDF Export Layout', 'High (P1)', 'Fix in Progress'],
+                      ['FTR-044', 'Samantha G.', 'Figma Live Sync Plugin', 'Medium (P2)', 'In Backlog']
+                    ]
+                  };
+                }
+              } else if (activeSidebarSection === 'settings') {
+                if (settingsTab === 'integrations') {
+                  activeDesc = 'Sync tokens, designs, and files directly with Figma, Adobe XD, Sketches, Slack, GitHub, and Notion.';
+                  mockData = {
+                    headers: ['Platform App', 'Category Type', 'Sync Scope', 'API connection', 'OAuth Status'],
+                    rows: [
+                      ['Figma Plugin API', 'Design Sync', 'Active Workspace', 'Live Connection', 'Authorized'],
+                      ['GitHub Repository Sync', 'Version Control', 'Design Tokens Export', 'Live Connection', 'Authorized'],
+                      ['Slack Workspace Webhook', 'Notifications', 'Audit Log Broadcasts', 'Live Connection', 'Authorized'],
+                      ['Notion Workspace API', 'Documentation', 'Asset Sync', 'Disconnected', 'Expired']
+                    ]
+                  };
+                } else if (settingsTab === 'security') {
+                  activeDesc = 'Platform-wide security defaults, 2-Factor Authentication (2FA) status, and IP blocking rules.';
+                  mockData = {
+                    headers: ['Security Rule', 'Scope', 'System Action', 'Last Updated', 'Status'],
+                    rows: [
+                      ['Enforce 2-Factor Authentication', 'Admins & Staff roles', 'Block login until configured', '2026-05-12', 'Active'],
+                      ['API Rate Limiting Enforcement', 'Developer Console endpoints', 'Rate limit to 100 reqs/min', '2026-07-01', 'Active'],
+                      ['Suspicious IP Range Lockout', 'Automated brute force attempts', 'Block IP range temporarily', 'Real-Time', 'Active']
+                    ]
+                  };
+                }
               }
 
               return (
