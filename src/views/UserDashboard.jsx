@@ -778,6 +778,7 @@ export default function UserDashboard() {
   const [selectedPresetId, setSelectedPresetId] = useState('');
   const [confirmOverwrite, setConfirmOverwrite] = useState(false);
   const [showActivateFirstModal, setShowActivateFirstModal] = useState(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(null);
   
   const tokensComplexityData = React.useMemo(() => {
     return (projects || []).map(p => ({
@@ -8029,17 +8030,12 @@ export default function UserDashboard() {
                     console.log('applyPresetToProject success:', success);
 
                     if (success) {
-                      const updated = useStore.getState().projects.find(p => p.id === modifyingProject.id);
-                      console.log('Updated project from store:', updated);
-                      
-                      setActiveProject(modifyingProject.id);
-                      if (updated) {
-                        loadPresetIntoBuilder(updated);
-                      }
-                      setIsBrandSelectedOrCreated(true);
-                      setActiveTab('create-brand');
-                      setModifyingProject(null);
-                      triggerToast(`Successfully applied "${preset.name}" preset foundation!`, 'success');
+                      setShowSuccessModal({
+                        projectId: modifyingProject.id,
+                        projectName: modifyingProject.name,
+                        presetName: preset.name,
+                        version: `${(modifyingProject.changelog?.length || 0) + 1}.0`
+                      });
                     } else {
                       triggerToast('Failed to apply preset foundation to this brand kit!', 'error');
                     }
@@ -8108,6 +8104,67 @@ export default function UserDashboard() {
                 className="flex-1 bg-sky-500 hover:bg-sky-650 text-white font-extrabold py-2 px-4 rounded-lg shadow-md cursor-pointer text-xs text-center justify-center border-none"
               >
                 <span>Activate & Proceed</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          PRESET APPLIED SUCCESS MODAL OVERLAY
+          ======================================================== */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-350">
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-xs" onClick={() => setShowSuccessModal(null)} />
+          
+          <div className={`relative w-full max-w-md rounded-2xl border p-6 shadow-2xl z-10 animate-in zoom-in-95 duration-200 text-center flex flex-col items-center space-y-4 ${
+            darkMode ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-202 text-slate-800'
+          }`}>
+            <div className="h-14 w-14 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-500 flex items-center justify-center border border-emerald-500/20 shadow-lg shadow-emerald-500/10 animate-bounce">
+              <LucideIcons.CheckCircle className="h-7 w-7" />
+            </div>
+            
+            <div>
+              <h3 className="text-base font-extrabold">
+                Preset Foundation Applied!
+              </h3>
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                The design foundation from <strong className="text-emerald-550 dark:text-emerald-400">"{showSuccessModal.presetName}"</strong> has been successfully applied to your brand kit <strong className="text-slate-850 dark:text-white">"{showSuccessModal.projectName}"</strong>.
+              </p>
+              <span className="text-[10px] text-slate-400 block mt-2">
+                A backup rollback point has been created as version <strong>v{showSuccessModal.version}</strong>.
+              </span>
+            </div>
+
+            <div className="w-full pt-2">
+              <Button
+                onClick={() => {
+                  try {
+                    const projectId = showSuccessModal.projectId;
+                    console.log('Success Modal Continue clicked for project:', projectId);
+                    
+                    const updated = useStore.getState().projects.find(p => p.id === projectId);
+                    console.log('Updated project from store:', updated);
+                    
+                    setActiveProject(projectId);
+                    if (updated) {
+                      loadPresetIntoBuilder(updated);
+                    }
+                    setIsBrandSelectedOrCreated(true);
+                    setActiveTab('create-brand');
+                    
+                    // Reset all modal states
+                    setShowSuccessModal(null);
+                    setModifyingProject(null);
+                    triggerToast(`Loaded updated "${showSuccessModal.projectName}" workstation!`, 'success');
+                  } catch (err) {
+                    console.error('Error in Success Modal Continue action:', err);
+                    triggerToast(`Error: ${err.message}`, 'error');
+                  }
+                }}
+                className="w-full bg-emerald-500 hover:bg-emerald-650 text-white font-extrabold py-2 px-4 rounded-lg shadow-md cursor-pointer text-xs text-center justify-center border-none"
+              >
+                <span>Continue to Workstation</span>
               </Button>
             </div>
           </div>
