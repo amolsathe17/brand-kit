@@ -143,6 +143,8 @@ export default function AdminDashboard() {
     { id: 'ord_8372', customer: 'alex@techstartup.com', items: 'Enterprise Custom Kit', total: '$899.00', date: '2026-07-05', status: 'Completed', gateway: 'PayPal' },
     { id: 'ord_2910', customer: 'director@corporate.com', items: 'Starter Kit Base', total: '$49.00', date: '2026-07-03', status: 'Refunded', gateway: 'Lemon Squeezy' }
   ]);
+  const [refundedOrderIds, setRefundedOrderIds] = useState([]);
+  const [selectedInvoice, setSelectedInvoice] = useState(null);
 
   // Subscription plan limits state
   const [subLimits, setSubLimits] = useState({
@@ -183,6 +185,44 @@ export default function AdminDashboard() {
   // Core Presets & Custom kits
   const presetProjects = (projects || []).filter(p => p.id.startsWith('p') && !p.id.includes('_'));
   const customProjects = (projects || []).filter(p => !p.id.startsWith('p') || p.id.includes('_'));
+
+  const combinedOrders = useMemo(() => {
+    const list = orders.map(o => {
+      if (refundedOrderIds.includes(o.id)) {
+        return { ...o, status: 'Refunded' };
+      }
+      return o;
+    });
+
+    const customProjs = (projects || []).filter(p => !p.id.startsWith('p') || p.id.includes('_'));
+    customProjs.forEach(p => {
+      const orderId = `ord_${p.id.substring(0, 6)}`;
+      if (!list.some(o => o.id === orderId)) {
+        const isRefunded = refundedOrderIds.includes(orderId);
+        list.push({
+          id: orderId,
+          customer: user?.email || 'hello@brandkit.ai',
+          items: `Brand Kit: ${p.name}`,
+          total: `$89.00`,
+          date: p.dateModified || new Date().toISOString().split('T')[0],
+          status: isRefunded ? 'Refunded' : 'Completed',
+          gateway: 'Stripe',
+          projectId: p.id
+        });
+      }
+    });
+
+    return list;
+  }, [orders, refundedOrderIds, projects, user]);
+
+  const filteredOrders = useMemo(() => {
+    const q = globalAdminSearch.toLowerCase();
+    return combinedOrders.filter(o => 
+      o.id.toLowerCase().includes(q) ||
+      o.customer.toLowerCase().includes(q) ||
+      o.items.toLowerCase().includes(q)
+    );
+  }, [combinedOrders, globalAdminSearch]);
 
   const triggerToast = (message, type = 'success') => {
     setToastMessage(message);
@@ -1319,11 +1359,34 @@ export default function AdminDashboard() {
                               </td>
                               <td className="p-3 text-right space-x-1.5">
                                 <button
-                                  onClick={() => downloadBrandKitJSON(project)}
-                                  className="p-1 rounded bg-sky-500/10 text-sky-500 hover:bg-sky-500 hover:text-white transition-all cursor-pointer"
-                                  title="Export JSON Spec"
+                                  onClick={() => {
+                                    downloadBrandKitJSON(project);
+                                    triggerToast(`Exported JSON specs for ${project.name}!`, 'success');
+                                  }}
+                                  className="p-1 rounded bg-amber-500/10 text-amber-500 hover:bg-amber-500 hover:text-white transition-all cursor-pointer border-none"
+                                  title="Download JSON Spec"
                                 >
                                   <FileText size={12} />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    downloadBrandKitMarkdown(project);
+                                    triggerToast(`Downloaded Markdown specs for ${project.name}!`, 'success');
+                                  }}
+                                  className="p-1 rounded bg-indigo-500/10 text-indigo-500 hover:bg-indigo-500 hover:text-white transition-all cursor-pointer border-none"
+                                  title="Download Markdown Spec"
+                                >
+                                  <Download size={12} />
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    downloadBrandKitPDF(project);
+                                    triggerToast(`Downloaded PDF report for ${project.name}!`, 'success');
+                                  }}
+                                  className="p-1 rounded bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all cursor-pointer border-none"
+                                  title="Download PDF Spec"
+                                >
+                                  <FileDown size={12} />
                                 </button>
                                 <button
                                   onClick={() => {
@@ -1655,7 +1718,7 @@ export default function AdminDashboard() {
                       </tr>
                     </thead>
                     <tbody className={`divide-y ${darkMode ? 'divide-slate-800/40' : 'divide-slate-200/40'}`}>
-                      {orders.map(o => (
+                      {filteredOrders.map(o => (
                         <tr key={o.id} className={`transition-colors ${tableRowClass}`}>
                           <td className="p-3 font-mono font-semibold text-slate-800 dark:text-slate-355">{o.id}</td>
                           <td className="p-3 text-slate-400">{o.customer}</td>
@@ -1675,16 +1738,286 @@ export default function AdminDashboard() {
                                     message: `Are you sure you want to refund ${o.total} back to ${o.customer}?`,
                                     onConfirm: () => {
                                       setOrders(prev => prev.map(item => item.id === o.id ? { ...item, status: 'Refunded' } : item));
+                                      setRefundedOrderIds(prev => [...prev, o.id]);
                                       setConfirmDialog(null);
                                       triggerToast(`Refund issued for order ${o.id}`, 'success');
                                     }
                                   });
                                 }}
-                                className="px-2 py-1 rounded bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white font-extrabold text-[9px] transition-all cursor-pointer"
+                                className="px-2 py-1 rounded bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white font-extrabold text-[9px] transition-all cursor-pointer border-none"
                               >
                                 Refund
                               </button>
                             )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+
+              {/* Coupon Creator */}
+              <Card className={`${cardClass} p-6 space-y-4`}>
+                <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Create Promo Coupon</h3>
+                <form onSubmit={handleAddCoupon} className="space-y-4">
+                  <div className="space-y-1">
+                    <label className="text-[10px] font-bold uppercase text-slate-400">Coupon Code</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. SKYBLUE30"
+                      value={newCouponCode}
+                      onChange={(e) => setNewCouponCode(e.target.value)}
+                      className={`text-xs rounded-lg px-3 py-2 border w-full font-bold focus:outline-none focus:ring-1 focus:ring-sky-500 ${
+                        darkMode ? 'bg-slate-950/60 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800'
+                      }`}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold uppercase text-slate-400">Discount</label>
+                      <input
+                        type="text"
+                        value={newCouponDiscount}
+                        onChange={(e) => setNewCouponDiscount(e.target.value)}
+                        className={`text-xs rounded-lg px-3 py-2 border w-full font-bold focus:outline-none focus:ring-1 focus:ring-sky-500 ${
+                          darkMode ? 'bg-slate-950/60 border-slate-800 text-slate-200' : 'bg-white border-slate-200 text-slate-800'
+                        }`}
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-bold uppercase text-slate-400">Type</label>
+                      <select 
+                        value={newCouponType}
+                        onChange={(e) => setNewCouponType(e.target.value)}
+                        className={`text-xs rounded-lg py-2 px-3 border w-full font-bold ${selectClass}`}
+                      >
+                        <option value="Percentage">Percentage</option>
+                        <option value="Flat">Flat Cash</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <Button type="submit" className="w-full bg-sky-500 hover:bg-sky-600 text-white font-extrabold py-2 px-4 rounded-lg shadow-md shadow-sky-500/10 cursor-pointer text-xs">
+                    <span>Create Coupon</span>
+                  </Button>
+                </form>
+              </Card>
+            </div>
+          )}
+
+          {/* VIEW: INVOICES MANAGER */}
+          {activeSubModule === 'orders-invoices' && (
+            <div className="space-y-6 animate-in fade-in duration-200">
+              <Card className={`${cardClass} p-6 space-y-6`}>
+                <div className="flex justify-between items-center">
+                  <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Generated Invoices</h3>
+                  <span className="text-[10px] text-slate-500">Transactions synced in real-time</span>
+                </div>
+                <div className="overflow-x-auto border rounded-xl dark:border-slate-800/60 bg-slate-500/[0.01]">
+                  <table className="w-full text-left text-xs min-w-[500px]">
+                    <thead className={`text-xs uppercase font-semibold border-b ${tableHeaderClass}`}>
+                      <tr>
+                        <th className="p-3">Invoice ID</th>
+                        <th className="p-3">Customer</th>
+                        <th className="p-3">Amount</th>
+                        <th className="p-3">Date</th>
+                        <th className="p-3">Status</th>
+                        <th className="p-3 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className={`divide-y ${darkMode ? 'divide-slate-800/40' : 'divide-slate-200/40'}`}>
+                      {filteredOrders.map(o => {
+                        const invId = `inv_${o.id.substring(4)}`;
+                        const isVoided = o.status === 'Refunded';
+                        return (
+                          <tr key={o.id} className={`transition-colors ${tableRowClass}`}>
+                            <td className="p-3 font-mono font-bold text-slate-800 dark:text-slate-355">{invId}</td>
+                            <td className="p-3 text-slate-400">{o.customer}</td>
+                            <td className="p-3 font-bold text-sky-500">{o.total}</td>
+                            <td className="p-3 text-slate-500">{o.date}</td>
+                            <td className="p-3">
+                              <span className={`text-[9px] font-extrabold py-0.5 px-2 rounded-full inline-block ${
+                                isVoided 
+                                  ? 'text-red-500 bg-red-500/10 border border-red-500/20' 
+                                  : 'text-emerald-500 bg-emerald-500/10 border border-emerald-500/20'
+                              }`}>
+                                {isVoided ? 'Voided' : 'Paid'}
+                              </span>
+                            </td>
+                            <td className="p-3 text-right">
+                              <button
+                                onClick={() => setSelectedInvoice(o)}
+                                className="px-2.5 py-1.5 rounded-lg bg-sky-500/10 hover:bg-sky-500 text-sky-500 hover:text-white font-extrabold text-[9px] transition-all cursor-pointer border-none"
+                              >
+                                View Receipt
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
+            </div>
+          )}
+
+          {/* VIEW: REFUNDS MANAGER */}
+          {activeSubModule === 'orders-refunds' && (() => {
+            const refundedList = combinedOrders.filter(o => o.status === 'Refunded');
+            const completedList = combinedOrders.filter(o => o.status === 'Completed');
+            return (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-200">
+                <Card className={`${cardClass} p-6 lg:col-span-2 space-y-6`}>
+                  <div className="flex justify-between items-center">
+                    <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Refund Ledger</h3>
+                    <span className="text-xs font-bold text-red-500 bg-red-500/10 border border-red-500/20 py-0.5 px-2.5 rounded-full uppercase">
+                      Total Refunds: {refundedList.length}
+                    </span>
+                  </div>
+                  <div className="overflow-x-auto border rounded-xl dark:border-slate-800/60 bg-slate-500/[0.01]">
+                    <table className="w-full text-left text-xs min-w-[500px]">
+                      <thead className={`text-xs uppercase font-semibold border-b ${tableHeaderClass}`}>
+                        <tr>
+                          <th className="p-3">Refund Code</th>
+                          <th className="p-3">Original Order</th>
+                          <th className="p-3">Customer</th>
+                          <th className="p-3">Amount</th>
+                          <th className="p-3">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className={`divide-y ${darkMode ? 'divide-slate-800/40' : 'divide-slate-200/40'}`}>
+                        {refundedList.length === 0 ? (
+                          <tr>
+                            <td colSpan={5} className="p-6 text-center text-slate-500">No refunds issued.</td>
+                          </tr>
+                        ) : (
+                          refundedList.map(o => {
+                            const refId = `ref_${o.id.substring(4)}`;
+                            return (
+                              <tr key={o.id} className={`transition-colors ${tableRowClass}`}>
+                                <td className="p-3 font-mono font-bold text-red-500">{refId}</td>
+                                <td className="p-3 font-mono text-slate-400">{o.id}</td>
+                                <td className="p-3 text-slate-400">{o.customer}</td>
+                                <td className="p-3 font-bold text-red-500">-{o.total}</td>
+                                <td className="p-3">
+                                  <span className="text-[9px] font-extrabold text-red-500 bg-red-500/10 border border-red-500/20 py-0.5 px-2 rounded-full inline-block">
+                                    Processed
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
+
+                {/* Instant Refund Processor Card */}
+                <Card className={`${cardClass} p-6 space-y-4`}>
+                  <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Issue Fast Refund</h3>
+                  <p className="text-xs text-slate-500">Select a completed transaction from the system log to issue a direct gateway reversal refund.</p>
+                  
+                  {completedList.length === 0 ? (
+                    <div className="p-4 border border-dashed rounded-lg text-center text-xs text-slate-500">
+                      No active completed transactions available to refund.
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-bold uppercase text-slate-400">Completed Transactions</label>
+                        <select
+                          id="instantRefundSelect"
+                          className={`text-xs rounded-lg py-2 px-3 border w-full font-bold ${selectClass}`}
+                        >
+                          {completedList.map(o => (
+                            <option key={o.id} value={o.id}>
+                              {o.id} - {o.customer} ({o.total})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <Button
+                        onClick={() => {
+                          const selectEl = document.getElementById('instantRefundSelect');
+                          const selectedOrderId = selectEl ? selectEl.value : null;
+                          if (selectedOrderId) {
+                            const o = completedList.find(item => item.id === selectedOrderId);
+                            if (o) {
+                              setConfirmDialog({
+                                title: 'Fast Reversal Refund',
+                                message: `Are you sure you want to issue a fast reversal of ${o.total} to ${o.customer}?`,
+                                onConfirm: () => {
+                                  setOrders(prev => prev.map(item => item.id === o.id ? { ...item, status: 'Refunded' } : item));
+                                  setRefundedOrderIds(prev => [...prev, o.id]);
+                                  setConfirmDialog(null);
+                                  triggerToast(`Fast refund processed for order ${o.id}`, 'success');
+                                }
+                              });
+                            }
+                          }
+                        }}
+                        className="w-full bg-red-500 hover:bg-red-650 text-white font-extrabold py-2 px-4 rounded-lg shadow-md cursor-pointer text-xs"
+                      >
+                        Issue Refund
+                      </Button>
+                    </div>
+                  )}
+                </Card>
+              </div>
+            );
+          })()}
+
+          {/* VIEW: COUPONS MANAGER */}
+          {activeSubModule === 'orders-coupons' && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-200">
+              <Card className={`${cardClass} p-6 lg:col-span-2 space-y-6`}>
+                <div className="flex justify-between items-center">
+                  <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Promo Coupon Codes</h3>
+                  <span className="text-[10px] text-slate-500">Active system-wide discounts</span>
+                </div>
+                <div className="overflow-x-auto border rounded-xl dark:border-slate-800/60 bg-slate-500/[0.01]">
+                  <table className="w-full text-left text-xs min-w-[500px]">
+                    <thead className={`text-xs uppercase font-semibold border-b ${tableHeaderClass}`}>
+                      <tr>
+                        <th className="p-3">Coupon Code</th>
+                        <th className="p-3">Discount</th>
+                        <th className="p-3">Type</th>
+                        <th className="p-3">Total Usages</th>
+                        <th className="p-3">Status</th>
+                        <th className="p-3 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className={`divide-y ${darkMode ? 'divide-slate-800/40' : 'divide-slate-200/40'}`}>
+                      {coupons.map(c => (
+                        <tr key={c.code} className={`transition-colors ${tableRowClass}`}>
+                          <td className="p-3 font-mono font-extrabold text-sky-500">{c.code}</td>
+                          <td className="p-3 font-bold text-slate-800 dark:text-slate-200">{c.discount}</td>
+                          <td className="p-3 text-slate-400">{c.type}</td>
+                          <td className="p-3 text-slate-500">{c.usage || '0 times'}</td>
+                          <td className="p-3">
+                            <span className={`text-[9px] font-extrabold py-0.5 px-2 rounded-full inline-block ${
+                              c.status === 'Active' 
+                                ? 'text-emerald-500 bg-emerald-500/10 border border-emerald-500/20' 
+                                : 'text-slate-400 bg-slate-500/10 border border-slate-500/20'
+                            }`}>
+                              {c.status}
+                            </span>
+                          </td>
+                          <td className="p-3 text-right">
+                            <button
+                              onClick={() => {
+                                setCoupons(prev => prev.filter(item => item.code !== c.code));
+                                triggerToast(`Deleted coupon: ${c.code}`, 'warning');
+                              }}
+                              className="p-1 rounded bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-all cursor-pointer border-none"
+                              title="Delete Coupon"
+                            >
+                              <Trash2 size={12} />
+                            </button>
                           </td>
                         </tr>
                       ))}
@@ -2311,7 +2644,7 @@ export default function AdminDashboard() {
           )}
 
           {/* FALLBACK VIEW FOR OTHER MODULES */}
-          {!['dashboard-overview', 'dashboard-analytics', 'dashboard-activity', 'customers-users', 'customers-orgs', 'customers-teams', 'customers-activity', 'brandkits-all', 'brandkits-categories', 'brandkits-components', 'marketplace-published', 'orders-purchases', 'subscriptions-limits', 'payments-gateways', 'media-images', 'content-docs', 'support-tickets', 'system-settings', 'system-flags', 'system-roles', 'system-audit', 'developer-api'].includes(activeSubModule) && (
+          {!['dashboard-overview', 'dashboard-analytics', 'dashboard-activity', 'customers-users', 'customers-orgs', 'customers-teams', 'customers-activity', 'brandkits-all', 'brandkits-categories', 'brandkits-components', 'marketplace-published', 'orders-purchases', 'orders-invoices', 'orders-refunds', 'orders-coupons', 'subscriptions-limits', 'payments-gateways', 'media-images', 'content-docs', 'support-tickets', 'system-settings', 'system-flags', 'system-roles', 'system-audit', 'developer-api'].includes(activeSubModule) && (
             <Card className={`${cardClass} p-8 text-center space-y-4 animate-in fade-in duration-200`}>
               <FolderOpen className="text-sky-500 h-12 w-12 mx-auto animate-pulse" />
               <div>
@@ -2456,6 +2789,104 @@ export default function AdminDashboard() {
                 className="text-xs font-extrabold py-2 px-4 rounded-lg cursor-pointer"
               >
                 Close Drawer
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          INVOICE RECEIPT MODAL OVERLAY
+          ======================================================== */}
+      {selectedInvoice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-xs" onClick={() => setSelectedInvoice(null)} />
+          
+          <div className={`relative w-full max-w-lg rounded-2xl border p-6 shadow-2xl z-10 animate-in zoom-in-95 duration-200 text-left ${
+            darkMode ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-202 text-slate-800'
+          }`}>
+            {/* Header */}
+            <div className="flex justify-between items-start border-b pb-4 dark:border-slate-800">
+              <div>
+                <div className="flex items-center space-x-1.5">
+                  <Sparkles className="text-sky-500 h-5 w-5" />
+                  <span className="text-sm font-black tracking-widest uppercase">BrandOS Studio</span>
+                </div>
+                <p className="text-[10px] text-slate-400 mt-1">Invoice Receipt & Payment Confirmation</p>
+              </div>
+              <button 
+                onClick={() => setSelectedInvoice(null)}
+                className="p-1 rounded-lg hover:bg-slate-500/10 text-slate-400 hover:text-white transition-colors cursor-pointer border-none bg-transparent"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            {/* Receipt Details */}
+            <div className="space-y-4 py-4 text-xs">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <span className="text-[9px] font-bold uppercase text-slate-400 block">Invoice Number</span>
+                  <span className="font-mono font-bold">{`INV_${selectedInvoice.id.substring(4).toUpperCase()}`}</span>
+                </div>
+                <div>
+                  <span className="text-[9px] font-bold uppercase text-slate-400 block">Date Issued</span>
+                  <span className="font-semibold">{selectedInvoice.date}</span>
+                </div>
+                <div>
+                  <span className="text-[9px] font-bold uppercase text-slate-400 block">Payment Method</span>
+                  <span className="font-semibold">{selectedInvoice.gateway}</span>
+                </div>
+                <div>
+                  <span className="text-[9px] font-bold uppercase text-slate-400 block">Status</span>
+                  <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full inline-block ${
+                    selectedInvoice.status === 'Refunded' 
+                      ? 'text-red-500 bg-red-500/10 border border-red-500/20' 
+                      : 'text-emerald-500 bg-emerald-500/10 border border-emerald-500/20'
+                  }`}>
+                    {selectedInvoice.status === 'Refunded' ? 'Voided / Refunded' : 'Paid'}
+                  </span>
+                </div>
+              </div>
+
+              <div className="border-t pt-4 dark:border-slate-800">
+                <span className="text-[9px] font-bold uppercase text-slate-400 block mb-2">Billed To</span>
+                <span className="font-mono font-bold text-slate-600 dark:text-slate-300">{selectedInvoice.customer}</span>
+              </div>
+
+              {/* Items Breakdown */}
+              <div className="border-t pt-4 dark:border-slate-800 space-y-2">
+                <span className="text-[9px] font-bold uppercase text-slate-400 block">Itemized Breakdown</span>
+                <div className="flex justify-between items-center py-1.5 border-b border-slate-500/5">
+                  <span className="font-semibold">{selectedInvoice.items}</span>
+                  <span className="font-bold">{selectedInvoice.total}</span>
+                </div>
+                
+                <div className="flex justify-between items-center pt-2 font-bold text-sm">
+                  <span>Total Amount</span>
+                  <span className="text-sky-500">{selectedInvoice.total}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Print Action */}
+            <div className="flex space-x-3 pt-4 border-t dark:border-slate-800">
+              <Button
+                onClick={() => {
+                  window.print();
+                }}
+                className="flex-1 bg-sky-500 hover:bg-sky-600 text-white font-extrabold py-2 px-4 rounded-lg shadow-md cursor-pointer text-xs text-center justify-center border-none"
+              >
+                <span>Print Invoice</span>
+              </Button>
+              <Button
+                onClick={() => setSelectedInvoice(null)}
+                variant="outline"
+                className={`flex-1 font-bold py-2 px-4 rounded-lg text-xs justify-center ${
+                  darkMode ? 'border-slate-800 text-slate-300 hover:bg-slate-900' : 'border-slate-202 text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <span>Close</span>
               </Button>
             </div>
           </div>
