@@ -686,7 +686,8 @@ export const useStore = create(
         name: role === 'admin' ? 'Admin Controller' : 'Alex Mercer',
         role,
         mobile: '+1 (555) 019-2834'
-      }
+      },
+      adminViewMode: role === 'admin' ? 'admin' : 'user'
     });
     return true;
   },
@@ -698,7 +699,8 @@ export const useStore = create(
         name: 'Mobile User',
         role: 'user',
         mobile
-      }
+      },
+      adminViewMode: 'user'
     });
     return true;
   },
@@ -711,13 +713,14 @@ export const useStore = create(
         role: 'user',
         mobile: null,
         avatar: customData?.avatar || null
-      }
+      },
+      adminViewMode: 'user'
     });
     return true;
   },
   
   logout: () => {
-    set({ user: null });
+    set({ user: null, adminViewMode: 'admin' });
   },
 
   updateUser: (updates) => {

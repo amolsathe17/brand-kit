@@ -2349,16 +2349,6 @@ export default function UserDashboard() {
             </div>
 
             <div className="flex items-center space-x-2 md:space-x-3">
-              {user?.role === 'admin' && (
-                <button
-                  onClick={() => setAdminViewMode('admin')}
-                  className="bg-sky-500 hover:bg-sky-650 text-white font-extrabold text-xs py-1.5 px-3 rounded-lg cursor-pointer transition-all shadow-md shadow-sky-500/10 flex items-center space-x-1 border-none mr-1"
-                  title="Return to Admin Panel Control"
-                >
-                  <Shield size={13} />
-                  <span className="hidden sm:inline">Admin Panel</span>
-                </button>
-              )}
               {/* Theme Toggle Button */}
               <button
                 onClick={toggleTheme}
