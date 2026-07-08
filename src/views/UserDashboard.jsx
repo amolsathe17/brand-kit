@@ -801,12 +801,6 @@ export default function UserDashboard() {
     const isCustom = activeProjectId && activeProjectId.includes('_');
     if (isCustom) {
       setIsBrandSelectedOrCreated(true);
-      setActiveTab(prev => {
-        if (['dashboard', 'overview'].includes(prev)) {
-          return 'create-brand';
-        }
-        return prev;
-      });
     }
   }, [activeProjectId]);
 
