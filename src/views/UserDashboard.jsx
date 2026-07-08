@@ -7954,7 +7954,7 @@ export default function UserDashboard() {
             {/* Confirmation details (Always Visible!) */}
             {selectedPresetId && (
               <div className={`p-4 border-t dark:border-slate-800 space-y-3 shrink-0 ${
-                darkMode ? 'bg-slate-950/20' : 'bg-slate-550/5'
+                darkMode ? 'bg-slate-950/20' : 'bg-slate-50'
               }`}>
                 <div className="flex items-start space-x-2">
                   <LucideIcons.AlertTriangle className="text-amber-500 h-4.5 w-4.5 shrink-0 mt-0.5" />
@@ -8002,28 +8002,50 @@ export default function UserDashboard() {
               </Button>
               <Button
                 onClick={() => {
-                  if (!selectedPresetId) {
-                    triggerToast('Please select a system preset first!', 'warning');
-                    return;
-                  }
-                  if (!confirmOverwrite) {
-                    triggerToast('Please explicitly check the overwrite confirmation box!', 'warning');
-                    return;
-                  }
-                  const preset = presetProjects.find(p => p.id === selectedPresetId);
-                  if (preset) {
-                    applyPresetToProject(modifyingProject.id, selectedPresetId);
+                  try {
+                    console.log('Confirm & Load Workstation clicked!');
+                    console.log('selectedPresetId:', selectedPresetId);
+                    console.log('confirmOverwrite:', confirmOverwrite);
+                    console.log('modifyingProject:', modifyingProject);
                     
-                    // Force workstation values synchronization
-                    const updated = useStore.getState().projects.find(p => p.id === modifyingProject.id);
-                    setActiveProject(modifyingProject.id);
-                    if (updated) {
-                      loadPresetIntoBuilder(updated);
+                    if (!selectedPresetId) {
+                      triggerToast('Please select a system preset first!', 'warning');
+                      return;
                     }
-                    setIsBrandSelectedOrCreated(true);
-                    setActiveTab('create-brand');
-                    setModifyingProject(null);
-                    triggerToast(`Successfully applied "${preset.name}" preset foundation!`, 'success');
+                    if (!confirmOverwrite) {
+                      triggerToast('Please explicitly check the overwrite confirmation box!', 'warning');
+                      return;
+                    }
+                    
+                    const preset = presetProjects.find(p => p.id === selectedPresetId);
+                    console.log('Found preset:', preset);
+                    if (!preset) {
+                      triggerToast('Selected preset could not be found!', 'error');
+                      return;
+                    }
+
+                    console.log('Calling applyPresetToProject with:', modifyingProject.id, selectedPresetId);
+                    const success = applyPresetToProject(modifyingProject.id, selectedPresetId);
+                    console.log('applyPresetToProject success:', success);
+
+                    if (success) {
+                      const updated = useStore.getState().projects.find(p => p.id === modifyingProject.id);
+                      console.log('Updated project from store:', updated);
+                      
+                      setActiveProject(modifyingProject.id);
+                      if (updated) {
+                        loadPresetIntoBuilder(updated);
+                      }
+                      setIsBrandSelectedOrCreated(true);
+                      setActiveTab('create-brand');
+                      setModifyingProject(null);
+                      triggerToast(`Successfully applied "${preset.name}" preset foundation!`, 'success');
+                    } else {
+                      triggerToast('Failed to apply preset foundation to this brand kit!', 'error');
+                    }
+                  } catch (err) {
+                    console.error('Error in Confirm button handler:', err);
+                    triggerToast(`Error: ${err.message}`, 'error');
                   }
                 }}
                 className="flex-1 bg-sky-500 hover:bg-sky-650 text-white font-extrabold py-2 px-4 rounded-lg shadow-md cursor-pointer text-xs text-center justify-center border-none"
