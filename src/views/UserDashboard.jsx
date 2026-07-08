@@ -777,6 +777,7 @@ export default function UserDashboard() {
   const [modifyingProject, setModifyingProject] = useState(null);
   const [selectedPresetId, setSelectedPresetId] = useState('');
   const [confirmOverwrite, setConfirmOverwrite] = useState(false);
+  const [showActivateFirstModal, setShowActivateFirstModal] = useState(null);
   
   const tokensComplexityData = React.useMemo(() => {
     return (projects || []).map(p => ({
@@ -2741,9 +2742,13 @@ export default function UserDashboard() {
                                   <span className="w-1.5" />
                                   <button
                                     onClick={() => {
-                                      setModifyingProject(project);
-                                      setSelectedPresetId('');
-                                      setConfirmOverwrite(false);
+                                      if (!isActive) {
+                                        setShowActivateFirstModal(project);
+                                      } else {
+                                        setModifyingProject(project);
+                                        setSelectedPresetId('');
+                                        setConfirmOverwrite(false);
+                                      }
                                     }}
                                     className={`text-xs py-1 px-3 rounded-full font-bold border transition-all cursor-pointer ${
                                       darkMode 
@@ -8024,6 +8029,63 @@ export default function UserDashboard() {
                 className="flex-1 bg-sky-500 hover:bg-sky-650 text-white font-extrabold py-2 px-4 rounded-lg shadow-md cursor-pointer text-xs text-center justify-center border-none"
               >
                 <span>Confirm & Load Workstation</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================
+          ACTIVATE BRAND KIT FIRST MODAL OVERLAY
+          ======================================================== */}
+      {showActivateFirstModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300">
+          <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-xs" onClick={() => setShowActivateFirstModal(null)} />
+          
+          <div className={`relative w-full max-w-md rounded-2xl border p-6 shadow-2xl z-10 animate-in zoom-in-95 duration-200 text-center flex flex-col items-center space-y-4 ${
+            darkMode ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-white border-slate-202 text-slate-800'
+          }`}>
+            <div className="h-14 w-14 rounded-full bg-amber-500/10 dark:bg-amber-500/20 text-amber-500 flex items-center justify-center border border-amber-500/20 shadow-lg shadow-amber-500/10">
+              <LucideIcons.AlertTriangle className="h-7 w-7" />
+            </div>
+            
+            <div>
+              <h3 className="text-base font-extrabold">
+                Activate Brand Kit
+              </h3>
+              <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+                You must activate <strong className="text-slate-850 dark:text-slate-150">"{showActivateFirstModal.name}"</strong> as your active workstation project before you can modify its design system with a preset foundation.
+              </p>
+            </div>
+
+            <div className="flex w-full space-x-3 pt-2">
+              <Button
+                onClick={() => setShowActivateFirstModal(null)}
+                variant="outline"
+                className={`flex-1 font-bold py-2 px-4 rounded-lg text-xs justify-center ${
+                  darkMode ? 'border-slate-800 text-slate-300 hover:bg-slate-900' : 'border-slate-202 text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <span>Cancel</span>
+              </Button>
+              <Button
+                onClick={() => {
+                  const targetKit = showActivateFirstModal;
+                  setActiveProject(targetKit.id);
+                  loadPresetIntoBuilder(targetKit);
+                  setIsBrandSelectedOrCreated(true);
+                  setActiveTab('create-brand');
+                  setShowActivateFirstModal(null);
+                  
+                  // Instantly open Modify / Apply Preset Modal since it is active now!
+                  setModifyingProject(targetKit);
+                  setSelectedPresetId('');
+                  setConfirmOverwrite(false);
+                  triggerToast(`Activated "${targetKit.name}" workstation! Choose a preset foundation.`, 'success');
+                }}
+                className="flex-1 bg-sky-50 hover:bg-sky-650 text-white font-extrabold py-2 px-4 rounded-lg shadow-md cursor-pointer text-xs text-center justify-center border-none"
+              >
+                <span>Activate & Proceed</span>
               </Button>
             </div>
           </div>
