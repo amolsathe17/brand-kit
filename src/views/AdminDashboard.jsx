@@ -851,42 +851,6 @@ export default function AdminDashboard() {
 
         {/* Scrollable View Area */}
         <div className="p-4 sm:p-6 md:p-8 w-full space-y-8 flex-1 overflow-x-hidden">
-          {/* Dashboard Tab Bar */}
-          {activeSidebarSection === 'dashboard' && (
-            <div className="flex border-b dark:border-slate-800 space-x-6 text-xs font-bold pb-2">
-              <button
-                onClick={() => setActiveSubModule('dashboard-overview')}
-                className={`pb-2 border-b-2 transition-all cursor-pointer ${
-                  activeSubModule === 'dashboard-overview' || activeSubModule === 'dashboard'
-                    ? 'border-sky-500 text-sky-500 font-extrabold'
-                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
-                }`}
-              >
-                Overview
-              </button>
-              <button
-                onClick={() => setActiveSubModule('dashboard-analytics')}
-                className={`pb-2 border-b-2 transition-all cursor-pointer ${
-                  activeSubModule === 'dashboard-analytics'
-                    ? 'border-sky-500 text-sky-500 font-extrabold'
-                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
-                }`}
-              >
-                Analytics
-              </button>
-              <button
-                onClick={() => setActiveSubModule('dashboard-activity')}
-                className={`pb-2 border-b-2 transition-all cursor-pointer ${
-                  activeSubModule === 'dashboard-activity'
-                    ? 'border-sky-500 text-sky-500 font-extrabold'
-                    : 'border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
-                }`}
-              >
-                Recent Activity
-              </button>
-            </div>
-          )}
-
           {/* Users Tab Bar */}
           {activeSidebarSection === 'users' && (
             <div className="flex border-b dark:border-slate-800 space-x-6 text-xs font-bold pb-2">
@@ -1138,7 +1102,7 @@ export default function AdminDashboard() {
           )}
 
 
-                    {['dashboard-overview', 'dashboard'].includes(activeSubModule) && activeSidebarSection === 'dashboard' && (
+                    {activeSidebarSection === 'dashboard' && (
             <div className="space-y-8 animate-in fade-in duration-200">
               {/* KPI Cards Grid */}
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -1466,33 +1430,6 @@ export default function AdminDashboard() {
                 </Card>
               </div>
             </div>
-          )}
-
-          {/* VIEW: DASHBOARD RECENT ACTIVITY */}
-          {activeSidebarSection === 'dashboard' && activeSubModule === 'dashboard-activity' && (
-            <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
-              <h3 className={`text-sm font-extrabold uppercase tracking-wider ${cardTitleClass}`}>Recent Platform Activity Feed</h3>
-              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 scrollbar-thin">
-                {[
-                  { time: '2 mins ago', type: 'Purchase', user: 'customer.john@gmail.com', desc: 'Purchased SaaS Pro Bundle for $149.00' },
-                  { time: '15 mins ago', type: 'Publish', user: 'designer.apex@tech.io', desc: 'Published Neon Cyberwave template to global presets' },
-                  { time: '1 hour ago', type: 'Registration', user: 'info@vectorlabs.net', desc: 'Registered new organization account (Vector Labs)' },
-                  { time: '2 hours ago', type: 'Refund', user: 'admin.finance@brandkit.ai', desc: 'Issued refund of $49.00 to user.darth@suspicious.io' }
-                ].map((act, index) => (
-                  <div key={index} className="flex space-x-4 border-l-2 border-slate-200 dark:border-slate-800 pl-4 relative py-2">
-                    <span className="absolute -left-1.5 top-3.5 h-3.5 w-3.5 rounded-full border bg-white dark:bg-slate-900 border-sky-500 block" />
-                    <div>
-                      <div className="flex items-center space-x-2 text-xs font-extrabold">
-                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-sky-500/10 text-sky-600 dark:text-sky-400 uppercase tracking-widest">{act.type}</span>
-                        <span>{act.user}</span>
-                        <span className="text-slate-400 font-normal text-[10px]">{act.time}</span>
-                      </div>
-                      <p className="text-xs text-slate-500 mt-1">{act.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
           )}
 
           {/* VIEW: CUSTOMERS USERS */}
