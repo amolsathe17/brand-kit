@@ -1140,6 +1140,82 @@ export default function AdminDashboard() {
 
                     {['dashboard-overview', 'dashboard'].includes(activeSubModule) && activeSidebarSection === 'dashboard' && (
             <div className="space-y-8 animate-in fade-in duration-200">
+              {/* KPI Cards Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                {[
+                  { label: 'Total Revenue', value: '$142,500.00', trend: '+12.4% this month', color: 'text-indigo-500' },
+                  { label: 'New Orders Today', value: '34 Completed', trend: '+8.3% today', color: 'text-emerald-500' },
+                  { label: 'Pending Payments', value: '5 Requests', trend: 'Reconciliation needed', color: 'text-amber-500' },
+                  { label: 'Active Users', value: '1,204 Users', trend: '+18.3% active now', color: 'text-sky-500' },
+                  { label: 'Brand Kits Created', value: '4,188 Kits', trend: '+312 this week', color: 'text-pink-500' },
+                  { label: 'AI Credits Used', value: '94,204 Utilized', trend: 'Gemini 2.5 Flash', color: 'text-purple-500' }
+                ].map((kpi, idx) => (
+                  <Card key={idx} className={`${cardClass} p-4 space-y-1 bg-slate-500/[0.01]`}>
+                    <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-550 tracking-wider">{kpi.label}</span>
+                    <h4 className={`text-sm md:text-base font-extrabold ${cardTitleClass}`}>{kpi.value}</h4>
+                    <span className={`text-[9px] font-bold ${kpi.color}`}>{kpi.trend}</span>
+                  </Card>
+                ))}
+              </div>
+
+              {/* Quick Actions Panel */}
+              <Card className={`${cardClass} p-5 space-y-3`}>
+                <div className="flex justify-between items-center border-b pb-2 dark:border-slate-800/60">
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Quick Actions Portal</span>
+                  <span className="text-[9px] text-slate-400">One-click administration short-cuts</span>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <Button 
+                    onClick={() => {
+                      setActiveSidebarSection('orders');
+                      setBillingTab('coupons');
+                      triggerToast('Coupon manager portal opened.', 'info');
+                    }}
+                    className="bg-sky-500 hover:bg-sky-600 text-white text-xs font-extrabold py-2 px-4 rounded-lg cursor-pointer border-none shadow-xs"
+                  >
+                    Create Coupon
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      setActiveSidebarSection('brandkits');
+                      setBrandkitTab('presets');
+                      triggerToast('Presets template manager loaded.', 'info');
+                    }}
+                    className="bg-indigo-500 hover:bg-indigo-650 text-white text-xs font-extrabold py-2 px-4 rounded-lg cursor-pointer border-none shadow-xs"
+                  >
+                    Add System Preset
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      setActiveSidebarSection('notifications');
+                      triggerToast('System notifications broadcasts opened.', 'info');
+                    }}
+                    className="bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-extrabold py-2 px-4 rounded-lg cursor-pointer border-none shadow-xs"
+                  >
+                    Send Announcement
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      setActiveSidebarSection('marketing');
+                      setMarketingTab('banners');
+                      triggerToast('Promotional banners editor loaded.', 'info');
+                    }}
+                    className="bg-amber-500 hover:bg-amber-600 text-white text-xs font-extrabold py-2 px-4 rounded-lg cursor-pointer border-none shadow-xs"
+                  >
+                    Add Promotional Banners
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      setActiveSidebarSection('brandkits');
+                      setBrandkitTab('list');
+                      triggerToast('Brand kit registry loaded.', 'info');
+                    }}
+                    className="bg-pink-500 hover:bg-pink-600 text-white text-xs font-extrabold py-2 px-4 rounded-lg cursor-pointer border-none shadow-xs"
+                  >
+                    Manage Brand Kits
+                  </Button>
+                </div>
+              </Card>
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Main Dispatcher table */}
                 <Card className={`${cardClass} p-6 lg:col-span-2 space-y-6 flex flex-col justify-between`}>
