@@ -50,18 +50,16 @@ export default function AdminDashboard() {
   const sidebarWidth = sidebarCollapsed ? 'w-20' : 'w-64';
   const [expandedSections, setExpandedSections] = useState({
     dashboard: true,
-    customers: true,
+    users: true,
     brandkits: false,
     marketplace: false,
     orders: false,
     subscriptions: false,
     payments: false,
-    media: false,
-    content: false,
     support: false,
     analytics: false,
-    system: false,
-    developer: false
+    developer: false,
+    settings: false
   });
 
   // Search & Filter state variables
@@ -464,99 +462,162 @@ export default function AdminDashboard() {
 
   // Left Sidebar Tree Data structure
   const navigationItems = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    icon: BarChart2
-  },
-  {
-    id: 'customers',
-    label: 'Customers',
-    icon: Users,
-    subItems: [
-      { id: 'customers-users', label: 'Users' },
-      { id: 'customers-orgs', label: 'Organizations' },
-      { id: 'customers-teams', label: 'Teams' },
-      { id: 'customers-activity', label: 'User Activity' }
-    ]
-  },
-  {
-    id: 'marketplace',
-    label: 'Marketplace',
-    icon: TrendingUp,
-    subItems: [
-      { id: 'marketplace-published', label: 'Published Kits' },
-      { id: 'marketplace-featured', label: 'Featured' },
-      { id: 'marketplace-reviews', label: 'Reviews' },
-      { id: 'marketplace-downloads', label: 'Downloads' }
-    ]
-  },
-  {
-    id: 'orders',
-    label: 'Orders',
-    icon: Calendar,
-    subItems: [
-      { id: 'orders-purchases', label: 'Purchases' },
-      { id: 'orders-invoices', label: 'Invoices' },
-      { id: 'orders-refunds', label: 'Refunds' },
-      { id: 'orders-coupons', label: 'Coupons' }
-    ]
-  },
-  {
-    id: 'subscriptions',
-    label: 'Subscriptions',
-    icon: Clock,
-    subItems: [
-      { id: 'subscriptions-plans', label: 'Plans' },
-      { id: 'subscriptions-active', label: 'Active Subscriptions' },
-      { id: 'subscriptions-trials', label: 'Trials' },
-      { id: 'subscriptions-limits', label: 'Usage Limits' }
-    ]
-  },
-  {
-    id: 'payments',
-    label: 'Payments',
-    icon: UserCheck,
-    subItems: [
-      { id: 'payments-transactions', label: 'Transactions' },
-      { id: 'payments-gateways', label: 'Payment Gateways' },
-      { id: 'payments-payouts', label: 'Payouts' },
-      { id: 'payments-taxes', label: 'Taxes' }
-    ]
-  },
-  {
-    id: 'support',
-    label: 'Support',
-    icon: MessageSquare,
-    subItems: [
-      { id: 'support-tickets', label: 'Tickets' },
-      { id: 'support-contact', label: 'Contact Forms' },
-      { id: 'support-features', label: 'Feature Requests' }
-    ]
-  },
-  {
-    id: 'system',
-    label: 'System Settings',
-    icon: Settings,
-    subItems: [
-      { id: 'system-settings', label: 'General Settings' },
-      { id: 'system-roles', label: 'Roles & Permissions' },
-      { id: 'system-flags', label: 'Feature Flags' },
-      { id: 'system-audit', label: 'Audit Logs' },
-      { id: 'system-keys', label: 'API Keys' }
-    ]
-  },
-  {
-    id: 'developer',
-    label: 'Developer Hub',
-    icon: Terminal,
-    subItems: [
-      { id: 'developer-api', label: 'API Logs' },
-      { id: 'developer-webhooks', label: 'Webhooks' },
-      { id: 'developer-integrations', label: 'Integrations' }
-    ]
-  }
-];
+    {
+      id: 'dashboard',
+      label: 'Dashboard',
+      icon: BarChart2
+    },
+    {
+      id: 'users',
+      label: 'Users',
+      icon: Users,
+      subItems: [
+        { id: 'users-all', label: 'All Users' },
+        { id: 'users-roles', label: 'User Roles' },
+        { id: 'users-companies', label: 'Companies' }
+      ]
+    },
+    {
+      id: 'brandkits',
+      label: 'Brand Kits',
+      icon: FolderOpen
+    },
+    {
+      id: 'designsystems',
+      label: 'Design Systems',
+      icon: Layers
+    },
+    {
+      id: 'marketplace',
+      label: 'Marketplace',
+      icon: TrendingUp
+    },
+    {
+      id: 'orders',
+      label: 'Orders',
+      icon: Calendar
+    },
+    {
+      id: 'payments',
+      label: 'Payments',
+      icon: Percent
+    },
+    {
+      id: 'subscriptions',
+      label: 'Subscriptions',
+      icon: Clock
+    },
+    {
+      id: 'invoices',
+      label: 'Invoices',
+      icon: FileText
+    },
+    {
+      id: 'coupons',
+      label: 'Coupons',
+      icon: Percent
+    },
+    {
+      id: 'templates',
+      label: 'Templates',
+      icon: Briefcase
+    },
+    {
+      id: 'assets',
+      label: 'Assets',
+      icon: Upload
+    },
+    {
+      id: 'tokens',
+      label: 'Design Tokens',
+      icon: Layers
+    },
+    {
+      id: 'presets',
+      label: 'System Presets',
+      icon: Sliders
+    },
+    {
+      id: 'support',
+      label: 'Support',
+      icon: MessageSquare
+    },
+    {
+      id: 'reviews',
+      label: 'Reviews',
+      icon: Star
+    },
+    {
+      id: 'notifications',
+      label: 'Notifications',
+      icon: Bell
+    },
+    {
+      id: 'analytics',
+      label: 'Analytics',
+      icon: Activity
+    },
+    {
+      id: 'reports',
+      label: 'Reports',
+      icon: FileDown
+    },
+    {
+      id: 'marketing',
+      label: 'Marketing',
+      icon: Share2
+    },
+    {
+      id: 'blogs',
+      label: 'Blogs',
+      icon: BookOpen
+    },
+    {
+      id: 'documentation',
+      label: 'Documentation',
+      icon: BookOpen
+    },
+    {
+      id: 'helpcenter',
+      label: 'Help Center',
+      icon: HelpCircle
+    },
+    {
+      id: 'aimonitoring',
+      label: 'AI Monitoring',
+      icon: Activity
+    },
+    {
+      id: 'developer',
+      label: 'Developer Console',
+      icon: Terminal
+    },
+    {
+      id: 'auditlogs',
+      label: 'Audit Logs',
+      icon: Clipboard
+    },
+    {
+      id: 'security',
+      label: 'Security',
+      icon: Shield
+    },
+    {
+      id: 'backups',
+      label: 'Backups',
+      icon: RefreshCw
+    },
+    {
+      id: 'integrations',
+      label: 'Integrations',
+      icon: Globe
+    },
+    {
+      id: 'settings',
+      label: 'Settings',
+      icon: Settings
+    }
+  ];
 
   // Helper for Breadcrumb path resolving
   const breadcrumbPath = useMemo(() => {
@@ -632,7 +693,36 @@ export default function AdminDashboard() {
                     } else {
                       setActiveSidebarSection(group.id);
                       const defaults = {
-                        'dashboard': 'dashboard-overview'
+                        'dashboard': 'dashboard-overview',
+                        'users': 'users-all',
+                        'brandkits': 'brandkits-all',
+                        'designsystems': 'brandkits-components',
+                        'marketplace': 'marketplace-published',
+                        'orders': 'orders-purchases',
+                        'payments': 'payments-gateways',
+                        'subscriptions': 'subscriptions-limits',
+                        'invoices': 'orders-invoices',
+                        'coupons': 'orders-coupons',
+                        'templates': 'marketplace-published',
+                        'assets': 'media-images',
+                        'tokens': 'brandkits-categories',
+                        'presets': 'marketplace-published',
+                        'support': 'support-tickets',
+                        'reviews': 'reviews',
+                        'notifications': 'notifications',
+                        'analytics': 'dashboard-analytics',
+                        'reports': 'reports',
+                        'marketing': 'marketing',
+                        'blogs': 'content-docs',
+                        'documentation': 'content-docs',
+                        'helpcenter': 'support-contact',
+                        'aimonitoring': 'aimonitoring',
+                        'developer': 'developer-api',
+                        'auditlogs': 'system-audit',
+                        'security': 'system-roles',
+                        'backups': 'backups',
+                        'integrations': 'integrations',
+                        'settings': 'system-settings'
                       };
                       setActiveSubModule(defaults[group.id] || group.id);
                       if (isMobile) setMobileMenuOpen(false);
@@ -951,7 +1041,7 @@ export default function AdminDashboard() {
             </div>
           )}
 
-                    {activeSubModule === 'dashboard-overview' && (
+                    {['dashboard-overview', 'dashboard'].includes(activeSubModule) && (
             <div className="space-y-8 animate-in fade-in duration-200">
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 {/* Main Dispatcher table */}
@@ -1127,7 +1217,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: DASHBOARD ANALYTICS */}
-          {activeSubModule === 'dashboard-analytics' && (
+          {['dashboard-analytics', 'analytics'].includes(activeSubModule) && (
             <div className="space-y-8 animate-in fade-in duration-200">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <Card className={`${cardClass} p-6 space-y-4`}>
@@ -1203,7 +1293,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: CUSTOMERS USERS */}
-          {activeSubModule === 'customers-users' && (
+          {['customers-users', 'users-all'].includes(activeSubModule) && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -1279,7 +1369,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: CUSTOMERS ORGS / TEAMS / ACTIVITY */}
-          {['customers-orgs', 'customers-teams', 'customers-activity'].includes(activeSubModule) && (
+          {['customers-orgs', 'customers-teams', 'customers-activity', 'users-companies'].includes(activeSubModule) && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Organizations & Teams Control</h3>
               <p className="text-xs text-slate-500">Overview of client structure, active teams, and API usage stats.</p>
@@ -1313,7 +1403,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: ALL BRAND KITS */}
-          {activeSubModule === 'brandkits-all' && (
+          {['brandkits-all', 'brandkits'].includes(activeSubModule) && (
             <div className="space-y-6 animate-in fade-in duration-200">
               <div className="flex justify-end">
                 <div className="relative shrink-0">
@@ -1480,7 +1570,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: DESIGN TOKENS EDITOR */}
-          {activeSubModule === 'brandkits-categories' && (
+          {['brandkits-categories', 'tokens'].includes(activeSubModule) && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-200">
               <Card className={`${cardClass} p-6 lg:col-span-2 space-y-6`}>
                 <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Global Design Tokens Registry</h3>
@@ -1572,7 +1662,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: COMPONENT LIBRARY */}
-          {activeSubModule === 'brandkits-components' && (
+          {['brandkits-components', 'designsystems'].includes(activeSubModule) && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-200">
               <Card className={`${cardClass} p-6 lg:col-span-2 space-y-6`}>
                 <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Reusable UI Component Spec Library</h3>
@@ -1652,7 +1742,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: MARKETPLACE MODERATION */}
-          {activeSubModule === 'marketplace-published' && (
+          {['marketplace-published', 'marketplace', 'templates', 'presets'].includes(activeSubModule) && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Marketplace Published Kits</h3>
               <div className="overflow-x-auto border rounded-xl dark:border-slate-800/60 bg-slate-500/[0.01]">
@@ -1718,7 +1808,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: ORDERS & REFUND MANAGER */}
-          {activeSubModule === 'orders-purchases' && (
+          {['orders-purchases', 'orders'].includes(activeSubModule) && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-200">
               <Card className={`${cardClass} p-6 lg:col-span-2 space-y-6`}>
                 <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Orders Ledger</h3>
@@ -1825,7 +1915,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: INVOICES MANAGER */}
-          {activeSubModule === 'orders-invoices' && (
+          {['orders-invoices', 'invoices'].includes(activeSubModule) && (
             <div className="space-y-6 animate-in fade-in duration-200">
               <Card className={`${cardClass} p-6 space-y-6`}>
                 <div className="flex justify-between items-center">
@@ -1989,7 +2079,7 @@ export default function AdminDashboard() {
           })()}
 
           {/* VIEW: COUPONS MANAGER */}
-          {activeSubModule === 'orders-coupons' && (
+          {['orders-coupons', 'coupons'].includes(activeSubModule) && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-200">
               <Card className={`${cardClass} p-6 lg:col-span-2 space-y-6`}>
                 <div className="flex justify-between items-center">
@@ -2094,7 +2184,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: SUBSCRIPTIONS & LIMITS EDITORS */}
-          {activeSubModule === 'subscriptions-limits' && (
+          {['subscriptions-limits', 'subscriptions'].includes(activeSubModule) && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-200">
               <Card className={`${cardClass} p-6 lg:col-span-2 space-y-6`}>
                 <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Active Plan Usage Limits</h3>
@@ -2184,7 +2274,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: PAYMENT GATEWAYS CONFIGURATION */}
-          {activeSubModule === 'payments-gateways' && (
+          {['payments-gateways', 'payments'].includes(activeSubModule) && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Active Payment Gateway Integrations</h3>
               
@@ -2224,7 +2314,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: MEDIA ASSET VAULT */}
-          {activeSubModule === 'media-images' && (
+          {['media-images', 'assets'].includes(activeSubModule) && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div>
@@ -2271,7 +2361,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: CONTENT DOCUMENTATION */}
-          {activeSubModule === 'content-docs' && (
+          {['content-docs', 'blogs', 'documentation'].includes(activeSubModule) && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-200">
               <Card className={`${cardClass} p-6 lg:col-span-2 space-y-6`}>
                 <h3 className={`text-base font-extrabold ${cardTitleClass}`}>System Knowledge Base Articles</h3>
@@ -2344,7 +2434,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: SUPPORT TICKETS */}
-          {activeSubModule === 'support-tickets' && (
+          {['support-tickets', 'support'].includes(activeSubModule) && (
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-200">
               <Card className={`${cardClass} p-6 lg:col-span-2 space-y-6`}>
                 <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Active Customer Tickets</h3>
@@ -2451,7 +2541,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: SYSTEM SETTINGS */}
-          {activeSubModule === 'system-settings' && (
+          {['system-settings', 'settings'].includes(activeSubModule) && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <h3 className={`text-base font-extrabold ${cardTitleClass}`}>General Brand System Parameters</h3>
               
@@ -2527,7 +2617,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: SYSTEM ROLES ACCESS MATRIX */}
-          {activeSubModule === 'system-roles' && (
+          {['system-roles', 'users-roles', 'security'].includes(activeSubModule) && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Granular Access Control Matrix</h3>
               <div className="overflow-x-auto border rounded-xl dark:border-slate-800/60 bg-slate-500/[0.01]">
@@ -2586,7 +2676,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: SYSTEM AUDIT LOGS */}
-          {activeSubModule === 'system-audit' && (
+          {['system-audit', 'auditlogs'].includes(activeSubModule) && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <h3 className={`text-base font-extrabold ${cardTitleClass}`}>System Audit logs</h3>
               <div className="overflow-x-auto border rounded-xl dark:border-slate-800/60 bg-slate-500/[0.01]">
@@ -2615,7 +2705,7 @@ export default function AdminDashboard() {
           )}
 
           {/* VIEW: DEVELOPER API & WEBHOOK EVENTS */}
-          {activeSubModule === 'developer-api' && (
+          {['developer-api', 'developer'].includes(activeSubModule) && (
             <Card className={`${cardClass} p-6 space-y-6 animate-in fade-in duration-200`}>
               <div className="flex justify-between items-center">
                 <div>
@@ -2661,20 +2751,189 @@ export default function AdminDashboard() {
           )}
 
           {/* FALLBACK VIEW FOR OTHER MODULES */}
-          {!['dashboard-overview', 'dashboard-analytics', 'dashboard-activity', 'customers-users', 'customers-orgs', 'customers-teams', 'customers-activity', 'brandkits-all', 'brandkits-categories', 'brandkits-components', 'marketplace-published', 'orders-purchases', 'orders-invoices', 'orders-refunds', 'orders-coupons', 'subscriptions-limits', 'payments-gateways', 'media-images', 'content-docs', 'support-tickets', 'system-settings', 'system-flags', 'system-roles', 'system-audit', 'developer-api'].includes(activeSubModule) && (
-            <Card className={`${cardClass} p-8 text-center space-y-4 animate-in fade-in duration-200`}>
-              <FolderOpen className="text-sky-500 h-12 w-12 mx-auto animate-pulse" />
-              <div>
-                <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Active Workspace View Loaded</h3>
-                <p className="text-xs text-slate-500 mt-1">This module is connected and syncing live data from API. Database transactions are secure.</p>
-              </div>
-              <Button 
-                onClick={() => triggerToast('Synchronized data frame complete!', 'success')}
-                className="bg-sky-500 hover:bg-sky-600 text-white text-xs font-extrabold py-2 px-6 rounded-lg shadow-md cursor-pointer"
-              >
-                Trigger Sync Frame
-              </Button>
-            </Card>
+          {!['dashboard', 'dashboard-overview', 'dashboard-analytics', 'dashboard-activity', 'users-all', 'customers-users', 'users-roles', 'system-roles', 'users-companies', 'customers-orgs', 'brandkits-all', 'brandkits', 'designsystems', 'brandkits-components', 'marketplace-published', 'marketplace', 'templates', 'presets', 'orders-purchases', 'orders', 'payments-gateways', 'payments', 'subscriptions-limits', 'subscriptions', 'orders-invoices', 'invoices', 'orders-coupons', 'coupons', 'media-images', 'assets', 'tokens', 'brandkits-categories', 'support-tickets', 'support', 'content-docs', 'blogs', 'documentation', 'support-contact', 'helpcenter', 'developer-api', 'developer', 'system-audit', 'auditlogs', 'developer-integrations', 'integrations', 'system-settings', 'settings', 'security', 'aimonitoring', 'orders-refunds'].includes(activeSubModule) && (
+            (() => {
+              let activeLabel = 'Workspace Module';
+              let activeDesc = 'Configure and sync enterprise assets, systems, and developer logs in real-time.';
+              let IconComponent = FolderOpen;
+              
+              const item = navigationItems.find(nav => nav.id === activeSidebarSection);
+              if (item) {
+                activeLabel = item.label;
+                IconComponent = item.icon || FolderOpen;
+                if (item.subItems) {
+                  const sub = item.subItems.find(s => s.id === activeSubModule);
+                  if (sub) {
+                    activeLabel = sub.label;
+                  }
+                }
+              }
+
+              let mockData = null;
+              if (activeSubModule === 'backups') {
+                activeDesc = 'Automated cloud database backups, restoration checkpoints, and storage snapshots.';
+                mockData = {
+                  headers: ['Backup ID', 'Snapshot Date', 'Size', 'Location', 'Status'],
+                  rows: [
+                    ['BK-9801', '2026-07-08 04:00', '1.24 GB', 'AWS S3 (us-east-1)', 'Completed'],
+                    ['BK-9752', '2026-07-07 04:00', '1.21 GB', 'AWS S3 (us-east-1)', 'Completed'],
+                    ['BK-9710', '2026-07-06 04:00', '1.20 GB', 'AWS S3 (us-east-1)', 'Completed'],
+                    ['BK-9689', '2026-07-05 04:00', '1.18 GB', 'AWS S3 (us-east-1)', 'Completed']
+                  ]
+                };
+              } else if (activeSubModule === 'integrations') {
+                activeDesc = 'Sync tokens, designs, and files directly with Figma, GitHub, Slack, Notion, and Jira.';
+                mockData = {
+                  headers: ['Platform', 'Type', 'Sync Status', 'Last Sync', 'Connection'],
+                  rows: [
+                    ['Figma Plugin', 'Design Sync', 'Active', '10 mins ago', 'Connected'],
+                    ['GitHub App', 'Version Control', 'Active', '1 hour ago', 'Connected'],
+                    ['Slack Webhook', 'Notifications', 'Active', '2 hours ago', 'Connected'],
+                    ['Notion Integration', 'Asset Sync', 'Inactive', 'Never', 'Disconnected']
+                  ]
+                };
+              } else if (activeSubModule === 'marketing') {
+                activeDesc = 'Manage customer newsletters, email campaign builders, referral programs, and analytics.';
+                mockData = {
+                  headers: ['Campaign Name', 'Target Audience', 'Sent Count', 'Open Rate', 'Status'],
+                  rows: [
+                    ['Weekly Digest #26', 'All Registered Users', '12,450', '42.8%', 'Sent'],
+                    ['Re-engagement Offer', 'Inactive Users (30d)', '1,200', '28.1%', 'Active'],
+                    ['July Premium Release', 'Enterprise Accounts', '450', '74.2%', 'Scheduled'],
+                    ['Welcome Sequence', 'New Users (Triggered)', 'Daily Flow', '88.5%', 'Active']
+                  ]
+                };
+              } else if (activeSubModule === 'notifications') {
+                activeDesc = 'Broadcast global push notifications, SMS alerts, and app-wide announcement banners.';
+                mockData = {
+                  headers: ['Announcement ID', 'Type', 'Target Aud', 'Delivery Date', 'Status'],
+                  rows: [
+                    ['ANN-104', 'App Banner', 'All Users', '2026-07-08', 'Published'],
+                    ['ANN-103', 'Push Notify', 'Starter/Pro Plans', '2026-07-05', 'Archived'],
+                    ['ANN-102', 'Email Blast', 'All Users', '2026-07-01', 'Archived']
+                  ]
+                };
+              } else if (activeSubModule === 'reports') {
+                activeDesc = 'Download detailed PDF, CSV, and Excel spreadsheets for daily sales, tax collections, and storage logs.';
+                mockData = {
+                  headers: ['Report Type', 'Period', 'File Format', 'Generated By', 'Download'],
+                  rows: [
+                    ['Daily Sales Ledger', 'Today (July 8)', 'CSV', 'Admin Controller', 'Download'],
+                    ['Tax & GST Audit', 'Q2 2026', 'Excel (.xlsx)', 'Finance Manager', 'Download'],
+                    ['Storage Capacity Metrics', 'Monthly (June)', 'PDF', 'System Daemon', 'Download']
+                  ]
+                };
+              } else if (activeSubModule === 'aimonitoring') {
+                activeDesc = 'Monitor prompt consumption costs, neural network suggestion logs, and model response metrics.';
+                mockData = {
+                  headers: ['Prompt Type', 'Model Provider', 'Latency (ms)', 'Tokens Used', 'Status'],
+                  rows: [
+                    ['Colors Generation', 'Gemini 2.5 Flash', '480 ms', '1,200', 'Success'],
+                    ['Typography Pairing', 'Gemini 2.5 Flash', '610 ms', '1,450', 'Success'],
+                    ['Brand Voice Copywriting', 'Gemini 2.5 Pro', '1,120 ms', '3,400', 'Success'],
+                    ['Icon Auto Suggest', 'Gemini 2.5 Flash', '320 ms', '800', 'Success']
+                  ]
+                };
+              } else if (activeSubModule === 'reviews') {
+                activeDesc = 'Moderate user feedback, review comments, ratings, and design approvals.';
+                mockData = {
+                  headers: ['User Name', 'Target Kit', 'Rating', 'Feedback Comment', 'Status'],
+                  rows: [
+                    ['Sarah Connor', 'Aethera Space', '5 Stars', 'Absolutely beautiful spacing and typography choices!', 'Approved'],
+                    ['Bruce Wayne', 'Veloce Motors', '5 Stars', 'Matches high performance brand requirements completely.', 'Approved'],
+                    ['Clark Kent', 'Nordic Cabin', '4 Stars', 'Love the warm colors, very sustainable design aesthetic.', 'Pending']
+                  ]
+                };
+              }
+
+              return (
+                <div className="space-y-6 animate-in fade-in duration-200">
+                  <Card className={`${cardClass} p-6`}>
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="p-3 bg-sky-500/10 rounded-lg text-sky-500">
+                          <IconComponent className="h-6 w-6" />
+                        </div>
+                        <div>
+                          <h3 className={`text-base font-extrabold ${cardTitleClass}`}>{activeLabel} Control Workspace</h3>
+                          <p className="text-xs text-slate-500 mt-1">{activeDesc}</p>
+                        </div>
+                      </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          onClick={() => triggerToast(`Synchronized ${activeLabel} successfully!`, 'success')}
+                          className="bg-sky-500 hover:bg-sky-600 text-white text-xs font-extrabold py-2 px-4 rounded-lg shadow-md cursor-pointer border-none"
+                        >
+                          Sync Ledger
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+
+                  {mockData ? (
+                    <Card className={`${cardClass} overflow-hidden`}>
+                      <div className="px-6 py-4 border-b dark:border-slate-800 flex justify-between items-center bg-slate-500/5">
+                        <span className="text-xs font-bold text-slate-800 dark:text-slate-200">{activeLabel} Live Transactions</span>
+                        <span className="text-[10px] text-sky-500 font-mono">System Secure TLS 1.3</span>
+                      </div>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-left text-xs border-collapse">
+                          <thead>
+                            <tr className="border-b dark:border-slate-800 bg-slate-500/5 text-slate-400 font-black">
+                              {mockData.headers.map((h, i) => (
+                                <th key={i} className="px-6 py-3 uppercase tracking-wider">{h}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y dark:divide-slate-850 divide-slate-100">
+                            {mockData.rows.map((row, rowIndex) => (
+                              <tr key={rowIndex} className={`transition-colors ${tableRowClass}`}>
+                                {row.map((cell, cellIndex) => (
+                                  <td key={cellIndex} className="px-6 py-3.5 text-slate-700 dark:text-slate-300 font-medium">
+                                    {cell === 'Download' ? (
+                                      <button 
+                                        onClick={() => triggerToast('Generating download payload...', 'info')}
+                                        className="text-sky-500 hover:text-sky-600 font-bold cursor-pointer"
+                                      >
+                                        Export File
+                                      </button>
+                                    ) : cell === 'Completed' || cell === 'Active' || cell === 'Connected' || cell === 'Published' || cell === 'Sent' || cell === 'Approved' || cell === 'Success' ? (
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/10">
+                                        {cell}
+                                      </span>
+                                    ) : cell === 'Inactive' || cell === 'Disconnected' || cell === 'Pending' ? (
+                                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-550/10">
+                                        {cell}
+                                      </span>
+                                    ) : (
+                                      cell
+                                    )}
+                                  </td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </Card>
+                  ) : (
+                    <Card className={`${cardClass} p-8 text-center space-y-4`}>
+                      <FolderOpen className="text-sky-500 h-12 w-12 mx-auto animate-pulse" />
+                      <div>
+                        <h3 className={`text-base font-extrabold ${cardTitleClass}`}>Active Database Link Connected</h3>
+                        <p className="text-xs text-slate-500 mt-1">This module is connected and syncing live data from API. Database transactions are secure.</p>
+                      </div>
+                      <Button 
+                        onClick={() => triggerToast(`Synchronized ${activeLabel} complete!`, 'success')}
+                        className="bg-sky-500 hover:bg-sky-600 text-white text-xs font-extrabold py-2 px-6 rounded-lg shadow-md cursor-pointer border-none"
+                      >
+                        Trigger Sync Frame
+                      </Button>
+                    </Card>
+                  )}
+                </div>
+              );
+            })()
           )}
 
         </div>
